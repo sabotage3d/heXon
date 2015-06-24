@@ -20,7 +20,7 @@
 
 #include <Urho3D/Graphics/StaticModel.h>
 #include <Urho3D/Audio/Sound.h>
-#include <Urho3D/Audio/SoundSource3D.h>
+#include <Urho3D/Audio/SoundSource.h>
 #include "sceneobject.h"
 
 class ArenaEdge : public SceneObject

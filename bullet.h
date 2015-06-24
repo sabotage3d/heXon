@@ -39,7 +39,7 @@ protected:
 private:
     double age_ = 0.0;
     double timeSinceHit_ = 0.0;
-    double lifetime_;
+    double lifeTime_;
     bool fading_ = false;
     double damage_;
     void HitCheck(float timeStep);

@@ -40,6 +40,12 @@ SceneObject::SceneObject(Context* context, MasterControl* masterControl, String 
     rootNode_ = masterControl_->world.scene->CreateChild(name);
 }
 
+void SceneObject::Set(Vector3 position)
+{
+    rootNode_->SetPosition(position);
+    rootNode_->SetEnabledRecursive(true);
+}
+
 void SceneObject::Disable()
 {
     masterControl_->tileMaster_->RemoveFromAffectors(rootNode_);

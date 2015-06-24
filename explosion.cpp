@@ -25,18 +25,22 @@
 #include <Urho3D/Graphics/ParticleEffect.h>
 #include <Urho3D/Audio/Sound.h>
 #include <Urho3D/Audio/SoundSource.h>
+#include <Urho3D/Math/Sphere.h>
 
 #include "tilemaster.h"
+#include "spawnmaster.h"
 #include "explosion.h"
+#include "hitfx.h"
 
-Explosion::Explosion(Context *context, MasterControl *masterControl, Vector3 position, Color color):
+Explosion::Explosion(Context *context, MasterControl *masterControl, Vector3 position, Color color, double size):
     Effect(context, masterControl, position, "Explosion"),
-    initialMass_{1.5f},
+    initialMass_{3.0f*size},
     initialBrightness_{8.0f}
 {
-    emitTime_ = 0.15;
+    emitTime_ = 0.20;
 
     rootNode_->SetPosition(position);
+    rootNode_->SetScale(size);
 
     rigidBody_ = rootNode_->CreateComponent<RigidBody>();
     rigidBody_->SetMass(initialMass_);
@@ -61,7 +65,7 @@ Explosion::Explosion(Context *context, MasterControl *masterControl, Vector3 pos
     sample_ = masterControl_->cache_->GetResource<Sound>("Resources/Samples/Explode.ogg");
     sample_->SetLooped(false);
     sampleSource_ = rootNode_->CreateComponent<SoundSource>();
-    sampleSource_->SetGain(0.5f);
+    sampleSource_->SetGain(Min(0.5f*size, 1.0f));
     sampleSource_->SetSoundType(SOUND_EFFECT);
     sampleSource_->Play(sample_);
 
@@ -72,6 +76,31 @@ Explosion::Explosion(Context *context, MasterControl *masterControl, Vector3 pos
 
 void Explosion::UpdateExplosion(StringHash eventType, VariantMap& eventData)
 {
-    rigidBody_->SetMass(Max(initialMass_*(0.23 - age_)/0.23,0.01));
-    light_->SetBrightness(Max(initialBrightness_*(0.25 - age_)/0.25,0.0));
+    using namespace Update;
+    float timeStep = eventData[P_TIMESTEP].GetFloat();
+
+    rigidBody_->SetMass(Max(initialMass_*((0.1 - age_)/0.1),0.01));
+    light_->SetBrightness(Max(initialBrightness_*(0.32 - age_)/0.32,0.0));
+
+    if (rootNode_->IsEnabled()) {
+        PODVector<RigidBody* > hitResults;
+        float radius = 2.0f*initialMass_ + age_*7.0f;
+        if (masterControl_->PhysicsSphereCast(hitResults,rootNode_->GetPosition(), radius, M_MAX_UNSIGNED)){
+            for (int i = 0; i < hitResults.Size(); i++){
+                if (!hitResults[i]->IsTrigger()){
+                    hitResults[i]->ApplyForce((hitResults[i]->GetNode()->GetWorldPosition() - rootNode_->GetWorldPosition()) * sqrt(radius-Vector3::Distance(rootNode_->GetWorldPosition(), hitResults[i]->GetNode()->GetWorldPosition()))*timeStep*500.0f*rigidBody_->GetMass()
+                                );
+                    //Deal damage
+                    unsigned hitID = hitResults[i]->GetNode()->GetID();
+                    float damage = rigidBody_->GetMass()*timeStep;
+                    if(masterControl_->spawnMaster_->spires_.Keys().Contains(hitID)){
+                        masterControl_->spawnMaster_->spires_[hitID]->Hit(damage, 1);
+                    }
+                    else if(masterControl_->spawnMaster_->razors_.Keys().Contains(hitID)){
+                        masterControl_->spawnMaster_->razors_[hitID]->Hit(damage, 1);
+                    }
+                }
+            }
+        }
+    }
 }

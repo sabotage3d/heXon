@@ -73,8 +73,8 @@ void MasterControl::Setup()
     engineParameters_["LogName"] = GetSubsystem<FileSystem>()->GetAppPreferencesDir("urho3d", "logs")+"heXon.log";
     engineParameters_["FullScreen"] = true;
     engineParameters_["Headless"] = false;
-    engineParameters_["WindowWidth"] = 1920;
-    engineParameters_["WindowHeight"] = 1080;
+    engineParameters_["WindowWidth"] = 1280;
+    engineParameters_["WindowHeight"] = 720;
 }
 void MasterControl::Start()
 {
@@ -144,10 +144,9 @@ void MasterControl::CreateUI()
 
     //Construct new Text object, set string to display and font to use
     Text* instructionText = ui_->GetRoot()->CreateChild<Text>();
-    instructionText->SetText(
-                "heXon"
-                );
+    instructionText->SetText("heXon");
     instructionText->SetFont(cache_->GetResource<Font>("Resources/Fonts/skirmishergrad.ttf"), 32);
+    instructionText->SetColor(Color(0.0f, 0.75f, 1.0f, 0.5f));
     //The text has multiple rows. Center them in relation to each other
     instructionText->SetHorizontalAlignment(HA_CENTER);
     instructionText->SetVerticalAlignment(VA_CENTER);
@@ -163,7 +162,7 @@ void MasterControl::CreateScene()
     physicsWorld_->SetGravity(Vector3::ZERO);
     world.scene->CreateComponent<DebugRenderer>();
 
-    //Create a Zone component for ambient lighting & fog control
+    //Create a Zone component for ambient ing & fog control
     Node* zoneNode = world.scene->CreateChild("Zone");
     Zone* zone = zoneNode->CreateComponent<Zone>();
     zone->SetBoundingBox(BoundingBox(Vector3(-100.0f, -50.0f, -100.0f),Vector3(100.0f, 0.0f, 100.0f)));
@@ -172,7 +171,7 @@ void MasterControl::CreateScene()
     zone->SetFogStart(56.8f);
     zone->SetFogEnd(61.8f);
 
-    //Add a point light to the world. Enable cascaded shadows on it
+    //Add a directional light to the world. Enable cascaded shadows on it
     Node* lightNode = world.scene->CreateChild("PointLight");
     lightNode->SetPosition(Vector3::UP*5.0);
     lightNode->SetRotation(Quaternion(90.0f, 0.0f, 0.0f));
@@ -184,17 +183,6 @@ void MasterControl::CreateScene()
     light->SetColor(Color(1.0f, 0.9f, 0.95f));
     light->SetCastShadows(false);
     light->SetShadowBias(BiasParameters(0.00025f, 0.5f));
-
-    //Create a second directional light without shadows
-    /*Node* lightNode2 = world.scene->CreateChild("DirectionalLight");
-    lightNode2->SetDirection(Vector3(0.0f, 1.0f, 0.0f));
-    Light* light2 = lightNode2->CreateComponent<Light>();
-    light2->SetLightType(LIGHT_DIRECTIONAL);
-    light2->SetBrightness(0.5f);
-    light2->SetColor(Color(0.2f, 0.7f, 1.0f));
-    light2->SetCastShadows(false);
-    light2->SetShadowBias(BiasParameters(0.00025f, 0.5f));*/
-
     //Set cascade splits at 10, 50, 200 world unitys, fade shadows at 80% of maximum shadow distance
     light->SetShadowCascade(CascadeParameters(7.0f, 23.0f, 42.0f, 500.0f, 0.8f));
 
@@ -279,8 +267,16 @@ bool MasterControl::PhysicsRayCast(PODVector<PhysicsRaycastResult> &hitResults, 
     else return false;
 }
 
+bool MasterControl::PhysicsSphereCast(PODVector<RigidBody*> &hitResults, Vector3 center, float radius, unsigned collisionMask = M_MAX_UNSIGNED)
+{
+    physicsWorld_->GetRigidBodies(hitResults, Sphere(center, radius), collisionMask);
+    if (hitResults.Size()) return true;
+    else return false;
+}
+
 void MasterControl::Exit()
 {
+
     engine_->Exit();
 }
 

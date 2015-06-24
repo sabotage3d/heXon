@@ -44,8 +44,9 @@ protected:
     Node* bottomNode_;
     StaticModel* topModel_;
     StaticModel* bottomModel_;
-    Vector2 textureOffset;
-    Vector2 textureOffsetDelta;
 
-    void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
+    float shotInterval_;
+    float sinceLastShot_;
+
+    void HandleSpireUpdate(StringHash eventType, VariantMap &eventData);
 };

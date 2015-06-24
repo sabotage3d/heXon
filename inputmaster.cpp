@@ -170,10 +170,11 @@ void InputMaster::HandleKeyDown(StringHash eventType, VariantMap &eventData)
         screenshot.SavePNG(fileName);
     }
     //Pause/Unpause game on P or joystick Start
-    /*else if (key == KEY_P || input_->GetJoystick(0)->GetButtonDown(9))
+    else if (key == KEY_P ||
+             ( input_->GetJoystick(0) && input_->GetJoystick(0)->GetButtonDown(9) ))
     {
-        //masterControl_->Pause game
-    }*/
+        masterControl_->SetPaused(!masterControl_->GetPaused());
+    }
     //Enter edit mode on E
 }
 

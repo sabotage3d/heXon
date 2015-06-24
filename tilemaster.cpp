@@ -29,16 +29,11 @@
 #include "tile.h"
 
 TileMaster::TileMaster(Context *context, MasterControl* masterControl):
-Object(context)
+Object(context),
+  masterControl_{masterControl}
 {
-    masterControl_ = masterControl;
-    //SubscribeToEvent(E_UPDATE, HANDLER(TileMaster, HandleUpdate));
     //Create hexagonal field
     //Lays a field of hexagons at the origin
-
-    //Adjust the ArenaEdge to Hexfield size
-    //GameObject.Find("ArenaEdge").transform.localScale *= bigHexSize + 1;
-    //And now for a braincracker:
     int bigHexSize = 23;
     for (int i = 0; i < bigHexSize; i++) {
         for (int j = 0; j < bigHexSize; j++) {
@@ -47,10 +42,6 @@ Object(context)
                     i + 1 < (bigHexSize - bigHexSize / 4) + ((bigHexSize - j + 1)) / 2 &&  //Exclude top right
                     i - 1 > (bigHexSize / 4) - ((bigHexSize - j + 2) / 2)) { //Exclude top left
                 Vector3 tilePos = Vector3((-bigHexSize / 2.0f + i) * 2.0f + j % 2, 0.0f, (-bigHexSize / 2.0f + j + 0.5f) * 1.8f);
-                //Add some obstacle
-                //if (Random.Range(0, 64) == 0) {
-                //    Instantiate(obstacle, goPos, Quaternion.identity);
-                //}
                 tileMap_[IntVector2(i, j)] = new Tile(context_, this, tilePos);
             }
         }
@@ -60,11 +51,6 @@ Object(context)
 
 void TileMaster::Start()
 {
-
-    /*masterControl.backgroundTiles = FindObjectsOfType<BackgroundTile>();
-
-    Vector3 addPos = new Vector3(0f, bigHexSize / 16f, -bigHexSize / 25f);
-    Camera.main.transform.position += addPos;*/
 }
 
 void TileMaster::Stop()
@@ -74,5 +60,16 @@ void TileMaster::Stop()
 Tile *TileMaster::GetRandomTile()
 {
     Vector<SharedPtr<Tile> > tiles = tileMap_.Values();
-    if (tiles.Length()) return tiles[Random((int)tiles.Length())];
+    if (tiles.Length()){
+        SharedPtr<Tile> tile;
+        while (!tile){
+            SharedPtr<Tile> tryTile = tiles[Random((int)tiles.Length())];
+            PODVector<PhysicsRaycastResult> hitResults;
+            Ray spawnRay(tryTile->rootNode_->GetPosition()-Vector3::UP, Vector3::UP*10.0f);
+            if (!masterControl_->PhysicsRayCast(hitResults, spawnRay, 23.0f, M_MAX_UNSIGNED)){
+                tile = tryTile;
+            }
+        }
+        return tile.Get();
+    }
 }

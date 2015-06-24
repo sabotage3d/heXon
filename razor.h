@@ -51,5 +51,5 @@ protected:
     Vector2 textureOffset;
     Vector2 textureOffsetDelta;
 
-    void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
+    void HandleRazorUpdate(StringHash eventType, VariantMap &eventData);
 };

@@ -23,6 +23,9 @@
 #include <Urho3D/Graphics/Model.h>
 #include <Urho3D/Graphics/Material.h>
 #include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/UI/UI.h>
+#include <Urho3D/UI/Text.h>
+#include <Urho3D/UI/Font.h>
 #include <Urho3D/Graphics/ParticleEmitter.h>
 #include <Urho3D/Graphics/ParticleEffect.h>
 #include <Urho3D/Audio/Sound.h>
@@ -32,6 +35,7 @@
 #include "tilemaster.h"
 #include "player.h"
 #include "bullet.h"
+#include "muzzle.h"
 
 Player::Player(Context *context, MasterControl *masterControl):
     SceneObject(context, masterControl, "Player")
@@ -43,7 +47,7 @@ Player::Player(Context *context, MasterControl *masterControl):
 
     rigidBody_ = rootNode_->CreateComponent<RigidBody>();
     rigidBody_->SetRestitution(0.666);
-    rigidBody_->SetMass(0.666f);
+    rigidBody_->SetMass(1.0f);
     rigidBody_->SetLinearFactor(Vector3::ONE - Vector3::UP);
     rigidBody_->SetLinearDamping(0.5f);
     //rigidBody_->ApplyForce(Vector3::LEFT*100);
@@ -73,7 +77,19 @@ Player::Player(Context *context, MasterControl *masterControl):
 
     masterControl_->tileMaster_->AddToAffectors(WeakPtr<Node>(rootNode_), WeakPtr<RigidBody>(rigidBody_));
 
+    /*scoreText_ = masterControl_->ui_->GetRoot()->CreateChild<Text>();
+    scoreText_->SetText(String(score_));
+    scoreText_->SetFont(masterControl_->cache_->GetResource<Font>("Resources/Fonts/skirmishergrad.ttf"), 32);
+    scoreText_->SetHorizontalAlignment(HA_LEFT);
+    scoreText_->SetVerticalAlignment(VA_TOP);
+    scoreText_->SetPosition(0, masterControl_->ui_->GetRoot()->GetHeight()/2.1);*/
+
     SubscribeToEvent(E_SCENEUPDATE, HANDLER(Player, HandleSceneUpdate));
+}
+
+void Player::AddScore(int points)
+{
+    score_ += points;
 }
 
 void Player::PlaySample(Sound* sample)
@@ -95,13 +111,13 @@ void Player::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
 
     Input* input = GetSubsystem<Input>();
 
-    //Movement
+    //Movement values
     Vector3 move = Vector3::ZERO;
     Vector3 moveJoy = Vector3::ZERO;
     Vector3 moveKey = Vector3::ZERO;
-    double thrust = 2350.0;
-    double maxSpeed = 16.0;
-    //Firing
+    double thrust = 2358.0;
+    double maxSpeed = 21.0;
+    //Firing values
     Vector3 fire = Vector3::ZERO;
     Vector3 fireJoy = Vector3::ZERO;
     Vector3 fireKey = Vector3::ZERO;
@@ -121,8 +137,6 @@ void Player::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
             Vector3::RIGHT * input->GetKeyDown(KEY_L) +
             Vector3::FORWARD * input->GetKeyDown(KEY_I) +
             Vector3::BACK * input->GetKeyDown(KEY_K);
-
-
 
     //Pick most significant input
     moveJoy.Length() > moveKey.Length() ? move = moveJoy : move = moveKey;
@@ -156,7 +170,8 @@ void Player::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
             Bullet* bullet = new Bullet(context_, masterControl_);
             bullet->rootNode_->SetPosition(rootNode_->GetPosition());
             bullet->rootNode_->LookAt(bullet->rootNode_->GetPosition() + fire);
-            bullet->rigidBody_->ApplyForce(fire*666.0f);
+            bullet->rigidBody_->ApplyForce(fire*1500.0f);
+            new Muzzle(context_, masterControl_, rootNode_->GetPosition());
             PlaySample(sample_);
         }
     }

@@ -39,7 +39,11 @@ SOURCES += \
     effect.cpp \
     explosion.cpp \
     spawnmaster.cpp \
-    spire.cpp
+    spire.cpp \
+    objectpool.cpp \
+    pickupcounter.cpp \
+    muzzle.cpp \
+    seeker.cpp
 
 HEADERS += \
     mastercontrol.h \
@@ -61,4 +65,8 @@ HEADERS += \
     effect.h \
     explosion.h \
     spawnmaster.h \
-    spire.h
+    spire.h \
+    objectpool.h \
+    pickupcounter.h \
+    muzzle.h \
+    seeker.h

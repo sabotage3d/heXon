@@ -41,8 +41,6 @@ Object(context)
     model_->SetMaterial(masterControl_->cache_->GetTempResource<Material>("Resources/Materials/BackgroundTile.xml"));
     model_->SetCastShadows(false);
 
-    //cursor_ = masterControl_->world.cursor.sceneCursor;
-
     referencePosition_ = rootNode_->GetPosition();
     centerDistExp_ = exp2(0.75*Vector3::Distance(Vector3::ZERO, referencePosition_));
 }
@@ -67,42 +65,36 @@ void Tile::Deselect()
 void Tile::HandleUpdate(StringHash eventType, VariantMap &eventData)
 {
     double elapsedTime = masterControl_->world.scene->GetElapsedTime();
-    //In edit-mode don't wave
-    /*if (masterControl_->editMode_) {
-        rootNode_->SetPosition(referencePosition_);
-        model_->GetMaterial(0)->SetShaderParameter("diffuseColor", Color(0.125f, 0.125f, 0.125f));
-    }
-    else {*/
-        double offsetY = 0.0;
+    double offsetY = 0.0;
 
-        //Alien Chaos - Disorder = time*1.0525f
-        //Talpa - Unusual Chair = time*1.444
-        wave_ = 6.0*pow(masterControl_->Sine(Abs(centerDistExp_ - elapsedTime * 1.0525)), 4.0);
+    //Alien Chaos - Disorder = time*1.0525f
+    //Talpa - Unusual Chair = time*1.444
+    wave_ = 6.0*pow(masterControl_->Sine(Abs(centerDistExp_ - elapsedTime * 0.666f)), 4.0);
 
-        uint nHexAffectors = tileMaster_->hexAffectors_.Size();
-        if (nHexAffectors) {
-            for (uint i = 0; i < nHexAffectors; i++) {
-                WeakPtr<Node> hexAffector = tileMaster_->hexAffectors_.Keys()[i];
-                double hexAffectorMass = tileMaster_->hexAffectors_[hexAffector]->GetMass();
+    uint nHexAffectors = tileMaster_->hexAffectors_.Size();
+    if (nHexAffectors) {
+        for (uint i = 0; i < nHexAffectors; i++) {
+            WeakPtr<Node> hexAffector = tileMaster_->hexAffectors_.Keys()[i];
+            double hexAffectorMass = tileMaster_->hexAffectors_[hexAffector]->GetMass();
 
-                if (hexAffector->IsEnabled()) {
-                    double offsetYPart = sqrt(2.0*hexAffectorMass) - (0.1* Vector3::Distance(referencePosition_, hexAffector->GetPosition()));
-                    if (offsetYPart > 0.0) {
-                        offsetYPart = pow(offsetYPart, 4);
-                        offsetY += offsetYPart;
-                    }
+            if (hexAffector->IsEnabled()) {
+                double offsetYPart = sqrt(hexAffectorMass) - (0.1* Vector3::Distance(referencePosition_, hexAffector->GetPosition()));
+                if (offsetYPart > 0.0) {
+                    offsetYPart = pow(offsetYPart, 4);
+                    offsetY += offsetYPart;
                 }
             }
-            offsetY = sqrt(offsetY);
         }
-        offsetY += 0.023f * wave_;
+        offsetY = sqrt(offsetY);
+    }
+    offsetY += 0.023f * wave_;
 
-        Vector3 lastPos = rootNode_->GetPosition();
-        Vector3 newPos = Vector3(lastPos.x_, referencePosition_.y_ - offsetY, lastPos.z_);
-        rootNode_->SetPosition(newPos);
+    Vector3 lastPos = rootNode_->GetPosition();
+    Vector3 newPos = Vector3(lastPos.x_, referencePosition_.y_ - offsetY, lastPos.z_);
+    rootNode_->SetPosition(newPos);
 
-        double color = Clamp((0.25 * offsetY) +0.3, 0.0, 1.0);
-        model_->GetMaterial(0)->SetShaderParameter("MatDiffColor", Color(color, color, color, color + (0.023 * wave_)));
+    double color = Clamp((0.25 * offsetY) +0.3, 0.0, 1.0);
+    model_->GetMaterial(0)->SetShaderParameter("MatDiffColor", Color(color, color, color, color + (0.023 * wave_)));
 }
 
 void Tile::FixFringe()

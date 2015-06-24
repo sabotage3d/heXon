@@ -20,6 +20,8 @@
 
 #include <Urho3D/Urho3D.h>
 #include <Urho3D/Graphics/StaticModel.h>
+#include <Urho3D/UI/Text.h>
+#include <Urho3D/UI/Font.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/Input/InputEvents.h>
 #include <Urho3D/Core/CoreEvents.h>
@@ -42,13 +44,17 @@ class Player : public SceneObject
     OBJECT(Player);
 public:
     Player(Context* context, MasterControl* masterControl);
+    SharedPtr<Text> scoreText_;
+
     double GetHealth(){return health_;}
     void Hit(float damage, int ownerID);
+    void AddScore(int points);
 private:
     double health_ = 1;
     double initialHealth_ = 1;
     int firstHitBy_ = 0;
     int lastHitBy_ = 0;
+    int score_ = 0;
 
     const double shotInterval_ = 0.23;
     double sinceLastShot_ = 0.0;

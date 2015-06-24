@@ -36,7 +36,7 @@
 
 Bullet::Bullet(Context *context, MasterControl *masterControl):
     SceneObject(context, masterControl, "Pickup"),
-    lifetime_{1.0f},
+    lifeTime_{1.0f},
     damage_{0.25f}
 {
     rootNode_->SetScale(Vector3(1.0f, 1.0f, 0.1f));
@@ -45,7 +45,7 @@ Bullet::Bullet(Context *context, MasterControl *masterControl):
     model_->SetMaterial(masterControl_->cache_->GetResource<Material>("Resources/Materials/Bullet.xml"));
 
     rigidBody_ = rootNode_->CreateComponent<RigidBody>();
-    rigidBody_->SetMass(0.2f);
+    rigidBody_->SetMass(0.5f);
     rigidBody_->SetLinearFactor(Vector3::ONE - Vector3::UP);
     rigidBody_->SetFriction(0.0f);
 
@@ -55,7 +55,7 @@ Bullet::Bullet(Context *context, MasterControl *masterControl):
 
     SubscribeToEvent(E_SCENEUPDATE, HANDLER(Bullet, HandleSceneUpdate));
 
-        masterControl_->tileMaster_->AddToAffectors(WeakPtr<Node>(rootNode_), WeakPtr<RigidBody>(rigidBody_));
+    masterControl_->tileMaster_->AddToAffectors(WeakPtr<Node>(rootNode_), WeakPtr<RigidBody>(rigidBody_));
 }
 
 void Bullet::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
@@ -69,7 +69,7 @@ void Bullet::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
                                 Max(1.75f - 10.0f*age_, 1.0f),
                                 Min(Min(35.0f*age_, 2.0f), Max(2.0f-timeSinceHit_*42.0f, 0.1f))
                                 ));
-    if (age_ > lifetime_) {
+    if (age_ > lifeTime_) {
         Disable();
     }
 
@@ -89,7 +89,7 @@ void Bullet::HitCheck(float timeStep) {
         Ray bulletRay(rootNode_->GetPosition(), rootNode_->GetDirection());
         if (masterControl_->PhysicsRayCast(hitResults, bulletRay, rigidBody_->GetLinearVelocity().Length()*timeStep, M_MAX_UNSIGNED)){
             for (int i = 0; i < hitResults.Size(); i++){
-                if (!hitResults[i].body_->IsTrigger()){
+                if (!hitResults[i].body_->IsTrigger() && hitResults[i].body_->GetNode()->GetNameHash() != N_PLAYER){
                     hitResults[i].body_->ApplyImpulse(rigidBody_->GetLinearVelocity()*0.05f);
                     new HitFX(context_, masterControl_, hitResults[i].position_);
                     //Deal damage
@@ -107,46 +107,3 @@ void Bullet::HitCheck(float timeStep) {
         }
     }
 }
-            //Old C# code
-            /*RaycastHit hit = new RaycastHit();
-            if (Physics.Raycast(transform.position, rigidbody.velocity.normalized, out hit, 0.01f + 1.5f * rigidbody.velocity.magnitude * Time.deltaTime, layerMask)) {
-                foreach (Player player in GameObject.FindObjectsOfType<Player>()) {
-                    if (player.playerID == ownerID) {
-                        GameObject hitFX = masterControl.hitFXs.FetchInactive();
-                        hitFX.transform.position = hit.point;
-                        hitFX.GetComponent<PoolObject>().Set();
-                        if (hasParticleSystem) hitFX.GetComponent<ParticleSystem>().startColor = particleSystem.startColor;
-                        hitFX.gameObject.SetActive(true);
-                    }
-                }
-
-
-                fading = true;
-                if (hit.transform.rigidbody)hit.transform.rigidbody.AddForce(rigidbody.velocity*0.2f,ForceMode.Impulse);
-                if (hit.transform.GetComponent<Player>()) {
-                    hit.transform.GetComponent<Player>().Hit(damage, ownerID);
-                }
-                else if (hit.transform.GetComponent<Razor>()) {
-                    hit.transform.GetComponent<Razor>().Hit(damage, ownerID);
-                }
-                else if (hit.transform.GetComponent<Spire>()) {
-                    hit.transform.GetComponent<Spire>().Hit(damage, ownerID);
-                }
-                else if (hit.transform.GetComponent<ChopEye>()) {
-                    hit.transform.GetComponent<ChopEye>().Hit(damage, ownerID);
-                }
-                else if (hit.transform.GetComponent<SpireBullet>()) {
-                    SpireBullet spireBullet = hit.transform.GetComponent<SpireBullet>();
-                    spireBullet.fading = true;
-                    GameObject hitFX = masterControl.hitFXs.FetchInactive();
-                    hitFX.transform.position = hit.point;
-                    hitFX.GetComponent<PoolObject>().Set();
-                    if (hasParticleSystem) hitFX.GetComponent<ParticleSystem>().startColor = spireBullet.particleSystem.startColor;
-                    hitFX.gameObject.SetActive(true);
-
-                }
-                else if (hit.transform.GetComponent<BoomerBullet>()) {
-                    hit.transform.GetComponent<BoomerBullet>().age = 1f;
-                }
-            }
-        }*/

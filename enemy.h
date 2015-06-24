@@ -38,18 +38,26 @@ class Enemy : public SceneObject
     friend class SpawnMaster;
     OBJECT(Enemy);
 public:
-    Enemy(Context* context, MasterControl* masterControl, Vector3 position);
+    Enemy(Context* context, MasterControl* masterControl, Vector3 position, String name);
     double GetHealth(){return health_;}
     void Hit(float damage, int ownerID);
+    void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
 protected:
-    double health_ = 1;
-    double initialHealth_ = 1;
-    double bonus_ = true;
+    float panicTime_ = 0.0;
+    float health_ = 1;
+    float initialHealth_ = 1;
+    float panic_ = 0.0f;
+    float mass_;
+    int worth_ = 5;
+    bool bonus_ = true;
     int firstHitBy_ = 0;
     int lastHitBy_ = 0;
 
+    SharedPtr<Node> particleNode_;
     RigidBody* rigidBody_;
     StaticModel* centerModel_;
     Color color_;
     void CheckHealth();
+    void Set(Vector3 position);
+    Color GetGlowColor();
 };

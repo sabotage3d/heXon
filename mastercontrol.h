@@ -20,6 +20,7 @@
 
 #include <Urho3D/Urho3D.h>
 #include <Urho3D/Scene/LogicComponent.h>
+#include <Urho3D/Scene/Scene.h>
 #include <Urho3D/Container/HashMap.h>
 #include <Urho3D/Engine/Application.h>
 #include <Urho3D/Graphics/Viewport.h>
@@ -76,6 +77,8 @@ StringHash const N_TILE = StringHash("Tile");
 StringHash const N_PLAYER = StringHash("Player");
 }
 
+enum JoyStickButton {JB_SELECT, JB_LEFTSTICK, JB_RIGHTSTICK, JB_START, JB_DPAD_UP, JB_DPAD_RIGHT, JB_DPAD_DOWN, JB_DPAD_LEFT, JB_L2, JB_R2, JB_L1, JB_R1, JB_TRIANGLE, JB_CIRCLE, JB_CROSS, JB_SQUARE};
+
 class MasterControl : public Application
 {
     /// Enable type information.
@@ -87,9 +90,13 @@ public:
     SharedPtr<PhysicsWorld> physicsWorld_;
     SharedPtr<ResourceCache> cache_;
     SharedPtr<Graphics> graphics_;
+    SharedPtr<UI> ui_;
+    SharedPtr<Renderer> renderer_;
+    SharedPtr<XMLFile> defaultStyle_;
     SharedPtr<TileMaster> tileMaster_;
     SharedPtr<InputMaster> inputMaster_;
     SharedPtr<SpawnMaster> spawnMaster_;
+
     SharedPtr<Player> player_;
     SharedPtr<Apple> apple_;
     SharedPtr<Heart> heart_;
@@ -107,18 +114,14 @@ public:
     float Sine(float x) { return sine_[(int)round(sine_.Length() * Cycle(x/M_PI, 0.0, 1.0))%sine_.Length()]; }
 
     bool GetPaused() { return paused_; }
-    void SetPaused(bool paused) { paused_ = paused; }
-    void Pause() { paused_ = true; }
-    void Unpause() { paused_ = false; }
+    void SetPaused(bool paused) { paused_ = paused; world.scene->SetUpdateEnabled(!paused);}
+    void Pause() { SetPaused(true);}
+    void Unpause() { SetPaused(false); }
     /// Edit-mode flag
     bool editMode_;
     bool PhysicsRayCast(PODVector<PhysicsRaycastResult> &hitResults, Urho3D::Ray ray, float distance, unsigned collisionMask);
+    bool PhysicsSphereCast(PODVector<RigidBody *> &hitResults, Vector3 center, float radius, unsigned collisionMask);
 private:
-    SharedPtr<UI> ui_;
-    SharedPtr<Renderer> renderer_;
-    SharedPtr<XMLFile> defaultStyle_;
-
-
     /// Set custom window title and icon
     void SetWindowTitleAndIcon();
     /// Create console and debug HUD

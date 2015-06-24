@@ -24,10 +24,10 @@
 
 SpawnMaster::SpawnMaster(Context *context, MasterControl *masterControl):
     Object(context),
-    RazorInterval_{3.0},
-    sinceRazorSpawn_{RazorInterval_},
+    RazorInterval_{5.0},
+    sinceRazorSpawn_{RazorInterval_-2.0f},
     SpireInterval_{23.0},
-    sinceSpireSpawn_{0.0}
+    sinceSpireSpawn_{SpireInterval_}
 {
     masterControl_ = masterControl;
 
@@ -54,6 +54,7 @@ void SpawnMaster::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
     sinceSpireSpawn_ += timeStep;
 
     if (sinceRazorSpawn_ > RazorInterval_) SpawnRazor(CreateSpawnPoint());
+    if (sinceSpireSpawn_ > SpireInterval_) SpawnSpire(CreateSpawnPoint());
 }
 
 void SpawnMaster::SpawnRazor(Vector3 position)

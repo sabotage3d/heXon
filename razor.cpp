@@ -28,16 +28,15 @@
 #include "razor.h"
 
 Razor::Razor(Context *context, MasterControl *masterControl, Vector3 position):
-    Enemy(context, masterControl, position),
+    Enemy(context, masterControl, position, "Razor"),
     topSpeed_{10.0},
     aimSpeed_{0.25*topSpeed_}
 {
-    Material* black = masterControl_->cache_->GetResource<Material>("Resources/Materials/Black.xml");
+    SharedPtr<Material> black = masterControl_->cache_->GetTempResource<Material>("Resources/Materials/Razor.xml");
 
     topNode_ = rootNode_->CreateChild();
     topModel_ = topNode_->CreateComponent<StaticModel>();
     topModel_->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/RazorTop.mdl"));
-    //topModel_->SetCastShadows(true);
     topModel_->SetMaterial(black);
 
     bottomNode_ = rootNode_->CreateChild();
@@ -45,25 +44,27 @@ Razor::Razor(Context *context, MasterControl *masterControl, Vector3 position):
     bottomModel_->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/RazorBottom.mdl"));
     bottomModel_->SetMaterial(black);
 
-    SubscribeToEvent(E_SCENEUPDATE, HANDLER(Razor, HandleSceneUpdate));
+    SubscribeToEvent(E_SCENEPOSTUPDATE, HANDLER(Razor, HandleRazorUpdate));
 }
 
-void Razor::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
+void Razor::HandleRazorUpdate(StringHash eventType, VariantMap &eventData)
 {
-    CheckHealth();
 
-    using namespace SceneUpdate;
+
+    using namespace ScenePostUpdate;
 
     double timeStep = eventData[P_TIMESTEP].GetFloat();
 
     //Spin
     topNode_->Rotate(Quaternion(0.0f, timeStep*50.0f*aimSpeed_, 0.0f));
     bottomNode_->Rotate(Quaternion(0.0f, timeStep*-50.0f*aimSpeed_, 0.0f));
+    //Flicker
+
+    topModel_->GetMaterial()->SetShaderParameter("MatEmissiveColor", GetGlowColor());
 
     //Emerge
     if (rootNode_->GetPosition().y_ < -0.1f) {
         rootNode_->Translate(Vector3::UP * timeStep * (0.25f - rootNode_->GetPosition().y_));
-        //topRenderer.materials[1].color = randomColor * 0.25f;
     }
     //Get moving
     else if (rigidBody_->GetLinearVelocity().Length() < 0.1f) {
@@ -71,13 +72,18 @@ void Razor::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
     }
     //Adjust speed
     else if (rigidBody_->GetLinearVelocity().Length() < aimSpeed_) {
-        rigidBody_->ApplyForce(rigidBody_->GetLinearVelocity().Normalized() * (aimSpeed_ - rigidBody_->GetLinearVelocity().Length()));
+        rigidBody_->ApplyForce(5.0f * rigidBody_->GetLinearVelocity().Normalized() * (aimSpeed_ - rigidBody_->GetLinearVelocity().Length()));
     }
-    else rigidBody_->ApplyForce(-rigidBody_->GetLinearVelocity());
+    else {
+        double overSpeed = rigidBody_->GetLinearVelocity().Length() - aimSpeed_;
+        rigidBody_->ApplyForce(-rigidBody_->GetLinearVelocity()*overSpeed);
+    }
 }
 
 void Razor::Hit(float damage, int ownerID)
 {
     Enemy::Hit(damage, ownerID);
-    aimSpeed_ = (1.0 - 0.75 * health_) * topSpeed_;
+    aimSpeed_ = (0.25 + 0.75 * panic_) * topSpeed_;
 }
+
+

@@ -30,6 +30,9 @@ using namespace Urho3D;
 
 class SceneObject : public Object
 {
+    friend class ObjectPool;
+    friend class Seeker;
+    OBJECT(SceneObject);
 public:
     SceneObject(Context *context, MasterControl* masterControl, String name);
 protected:
@@ -37,4 +40,5 @@ protected:
     void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
     SharedPtr<Node> rootNode_;
     void Disable();
+    void Set(Vector3 position);
 };
