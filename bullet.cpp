@@ -35,10 +35,11 @@
 #include "hitfx.h"
 
 Bullet::Bullet(Context *context, MasterControl *masterControl):
-    SceneObject(context, masterControl, "Pickup"),
+    SceneObject(context, masterControl),
     lifeTime_{1.0f},
     damage_{0.25f}
 {
+    rootNode_->SetName("Bullet");
     rootNode_->SetScale(Vector3(1.0f, 1.0f, 0.1f));
     model_ = rootNode_->CreateComponent<StaticModel>();
     model_->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Bullet.mdl"));

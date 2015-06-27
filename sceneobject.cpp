@@ -31,13 +31,13 @@
 #include "tilemaster.h"
 #include "sceneobject.h"
 
-SceneObject::SceneObject(Context* context, MasterControl* masterControl, String name):
+SceneObject::SceneObject(Context* context, MasterControl* masterControl):
     Object(context)
 {
     masterControl_ = masterControl;
 
     //Create the root node.
-    rootNode_ = masterControl_->world.scene->CreateChild(name);
+    rootNode_ = masterControl_->world.scene->CreateChild("SceneObject");
 }
 
 void SceneObject::Set(Vector3 position)

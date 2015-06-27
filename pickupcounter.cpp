@@ -12,6 +12,7 @@
 #include "pickupcounter.h"
 
 PickupCounter::PickupCounter(Context* context, MasterControl* masterControl, Vector3 origin):
-    SceneObject(context, masterControl, "PickupCounter")
+    SceneObject(context, masterControl)
 {
+    rootNode_->SetName("PickupCounter");
 }

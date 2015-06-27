@@ -27,8 +27,10 @@
 #include "muzzle.h"
 
 Muzzle::Muzzle(Context *context, MasterControl *masterControl, Vector3 position):
-    Effect(context, masterControl, position, "Muzzle")
+    Effect(context, masterControl, position)
 {
+    rootNode_->SetName("Muzzle");
+
     rootNode_->SetPosition(position);
     particleEmitter_ = rootNode_->CreateComponent<ParticleEmitter>();
     ParticleEffect* particleEffect = masterControl_->cache_->GetResource<ParticleEffect>("Resources/Particles/Muzzle.xml");

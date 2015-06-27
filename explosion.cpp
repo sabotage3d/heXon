@@ -33,11 +33,11 @@
 #include "hitfx.h"
 
 Explosion::Explosion(Context *context, MasterControl *masterControl, Vector3 position, Color color, double size):
-    Effect(context, masterControl, position, "Explosion"),
+    Effect(context, masterControl, position),
     initialMass_{3.0f*size},
     initialBrightness_{8.0f}
 {
-    emitTime_ = 0.20;
+    rootNode_->SetName("Explosion");
 
     rootNode_->SetPosition(position);
     rootNode_->SetScale(size);

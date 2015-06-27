@@ -34,7 +34,7 @@ class SceneObject : public Object
     friend class Seeker;
     OBJECT(SceneObject);
 public:
-    SceneObject(Context *context, MasterControl* masterControl, String name);
+    SceneObject(Context *context, MasterControl* masterControl);
 protected:
     MasterControl* masterControl_;
     void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);

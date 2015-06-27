@@ -24,9 +24,10 @@
 
 #include "effect.h"
 
-Effect::Effect(Context *context, MasterControl *masterControl, Vector3 position, String name):
-    SceneObject(context, masterControl, name)
+Effect::Effect(Context *context, MasterControl *masterControl, Vector3 position):
+    SceneObject(context, masterControl)
 {
+    rootNode_->SetName("Effect");
     rootNode_->SetPosition(position);
     particleEmitter_ = rootNode_->CreateComponent<ParticleEmitter>();
 

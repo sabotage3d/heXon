@@ -88,7 +88,7 @@ void heXoCam::SetupViewport()
     effectRenderPath_->SetEnabled("FXAA3", true);
     effectRenderPath_->Append(cache->GetResource<XMLFile>("PostProcess/Bloom.xml"));
     effectRenderPath_->SetShaderParameter("BloomThreshold", 0.23f);
-    effectRenderPath_->SetShaderParameter("BloomMix", Vector2(1.666f, 2.666f));
+    effectRenderPath_->SetShaderParameter("BloomMix", Vector2(1.75f, 2.25f));
     effectRenderPath_->SetEnabled("Bloom", true);
     viewport_->SetRenderPath(effectRenderPath_);
     renderer->SetViewport(0, viewport);

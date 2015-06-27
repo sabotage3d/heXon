@@ -28,10 +28,12 @@
 #include "razor.h"
 
 Razor::Razor(Context *context, MasterControl *masterControl, Vector3 position):
-    Enemy(context, masterControl, position, "Razor"),
+    Enemy(context, masterControl, position),
     topSpeed_{10.0},
     aimSpeed_{0.25*topSpeed_}
 {
+    rootNode_->SetName("Razor");
+
     SharedPtr<Material> black = masterControl_->cache_->GetTempResource<Material>("Resources/Materials/Razor.xml");
 
     topNode_ = rootNode_->CreateChild();

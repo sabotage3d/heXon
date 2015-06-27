@@ -32,10 +32,12 @@
 #include "tilemaster.h"
 #include "player.h"
 
-Enemy::Enemy(Context *context, MasterControl *masterControl, Vector3 position, String name):
-    SceneObject(context, masterControl, name),
+Enemy::Enemy(Context *context, MasterControl *masterControl, Vector3 position):
+    SceneObject(context, masterControl),
     mass_{2.0f}
 {
+    rootNode_->SetName("Enemy");
+
     rootNode_->SetPosition(position);
     //Generate random color
     int randomizer = Random(6);

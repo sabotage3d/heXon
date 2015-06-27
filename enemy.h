@@ -38,7 +38,7 @@ class Enemy : public SceneObject
     friend class SpawnMaster;
     OBJECT(Enemy);
 public:
-    Enemy(Context* context, MasterControl* masterControl, Vector3 position, String name);
+    Enemy(Context* context, MasterControl* masterControl, Vector3 position);
     double GetHealth(){return health_;}
     void Hit(float damage, int ownerID);
     void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);

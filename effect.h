@@ -38,7 +38,7 @@ class Effect : public SceneObject
 {
     OBJECT(Effect);
 public:
-    Effect(Context* context, MasterControl* masterControl, Vector3 position, String name);
+    Effect(Context* context, MasterControl* masterControl, Vector3 position);
     void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
 protected:
     SharedPtr<ParticleEmitter> particleEmitter_;

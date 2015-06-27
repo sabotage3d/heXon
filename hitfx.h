@@ -38,7 +38,7 @@ class HitFX : public Effect
 {
     OBJECT(HitFX);
 public:
-    HitFX(Context* context, MasterControl* masterControl, Vector3 position);
+    HitFX(Context* context, MasterControl* masterControl, Vector3 position, bool sound = true);
     void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
 private:
     SharedPtr<Sound> sample_;

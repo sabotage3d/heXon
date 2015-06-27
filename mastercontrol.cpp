@@ -55,6 +55,12 @@
 #include "apple.h"
 #include "heart.h"
 #include "arenaedge.h"
+#include "bullet.h"
+#include "seeker.h"
+#include "flash.h"
+#include "hitfx.h"
+#include "explosion.h"
+#include "muzzle.h"
 
 DEFINE_APPLICATION_MAIN(MasterControl);
 
@@ -213,7 +219,6 @@ void MasterControl::CreateScene()
 
     spawnMaster_ = new SpawnMaster(context_, this);
 
-    //new Pickup(context_, this);
     player_ = new Player(context_, this);
     apple_ = new Apple(context_, this);
     heart_ = new Heart(context_, this);

@@ -38,8 +38,15 @@
 #include "muzzle.h"
 
 Player::Player(Context *context, MasterControl *masterControl):
-    SceneObject(context, masterControl, "Player")
+    SceneObject(context, masterControl),
+    initialHealth_{10.0},
+    health_{initialHealth_},
+    score_{0},
+    weaponLevel_{0},
+    bulletAmount_{0}
 {
+    rootNode_->SetName("Player");
+
     model_ = rootNode_->CreateComponent<StaticModel>();
     model_->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Swift.mdl"));
     model_->SetMaterial(0, masterControl_->cache_->GetTempResource<Material>("Resources/Materials/GreenGlowEnvmap.xml"));
@@ -67,8 +74,8 @@ Player::Player(Context *context, MasterControl *masterControl):
     particleEffect->SetColorFrames(colorFrames);
     particleEmitter->SetEffect(particleEffect);
 
-    sample_ = masterControl_->cache_->GetResource<Sound>("Resources/Samples/Shot.ogg");
-    sample_->SetLooped(false);
+    shot_ = masterControl_->cache_->GetResource<Sound>("Resources/Samples/Shot.ogg");
+    shot_->SetLooped(false);
     for (int i = 0; i < 3; i++){
         sampleSources_.Push(SharedPtr<SoundSource>(rootNode_->CreateComponent<SoundSource>()));
         sampleSources_[i]->SetGain(0.3f);
@@ -96,7 +103,7 @@ void Player::PlaySample(Sound* sample)
 {
     for (int i = 0; i < sampleSources_.Length(); i++){
         if (!sampleSources_[i]->IsPlaying()){
-            sampleSources_[i]->Play(sample_);
+            sampleSources_[i]->Play(shot_);
             break;
         }
     }
@@ -166,14 +173,73 @@ void Player::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
     if (fire.Length()) {
         if (sinceLastShot_ > shotInterval_)
         {
+            for (int i = 0; i < bulletAmount_; i++) {
+                float angle = 0.0f;
+                switch (i) {
+                case 0: if (bulletAmount_ == 2 || bulletAmount_ == 3)
+                        angle = -5.0f;
+                    break;
+                case 1:
+                    if (bulletAmount_ < 4) angle = 5.0f;
+                    else angle = 7.5f;
+                    break;
+                case 2:
+                    if (bulletAmount_ < 5) angle = 180.0f;
+                    angle = 175.0f;
+                    break;
+                case 3:
+                    angle = -7.5f;
+                    break;
+                case 4:
+                    angle = 185.0f;
+                    break;
+                default: break;
+                }
+                FireBullet(fire, angle);
+            }
             sinceLastShot_ = 0.0;
-            Bullet* bullet = new Bullet(context_, masterControl_);
-            bullet->rootNode_->SetPosition(rootNode_->GetPosition());
-            bullet->rootNode_->LookAt(bullet->rootNode_->GetPosition() + fire);
-            bullet->rigidBody_->ApplyForce(fire*1500.0f);
-            new Muzzle(context_, masterControl_, rootNode_->GetPosition());
-            PlaySample(sample_);
+            if (bulletAmount_ > 0){
+                new Muzzle(context_, masterControl_, rootNode_->GetPosition());
+                PlaySample(shot_);
+            }
         }
     }
 }
 
+void Player::FireBullet(const Vector3 fire, const float angle){
+    Vector3 direction = Quaternion(angle, Vector3::UP) * fire;
+    Bullet* bullet = new Bullet(context_, masterControl_);
+    bullet->rootNode_->SetPosition(rootNode_->GetPosition() + direction);
+    bullet->rootNode_->LookAt(bullet->rootNode_->GetPosition() + direction*5.0f);
+    bullet->rigidBody_->ApplyForce(direction*1500.0f);
+    bullet->damage_ = 0.15f + 0.005f * weaponLevel_;
+}
+
+void Player::Pickup(const StringHash nameHash)
+{
+    if (nameHash == N_APPLE){
+        bulletAmount_ = (bulletAmount_ == 0)?1:bulletAmount_;
+        ++appleCount_;
+        heartCount_ = 0;
+        score_ += 23;
+        if (appleCount_ >= 5){
+            appleCount_ = 0;
+            UpgradeWeapons();
+        }
+    }
+    else if (nameHash == N_HEART){
+        ++heartCount_;
+        appleCount_ = 0;
+        if (heartCount_ >= 5){
+            heartCount_ = 0;
+            health_ = 15.0;
+        }
+        else health_ = Max(health_, Clamp(health_+5.0, 0.0, 10.0));
+    }
+}
+
+void Player::UpgradeWeapons()
+{
+    ++weaponLevel_;
+    bulletAmount_ = 1 + ((weaponLevel_+5) / 6);
+}

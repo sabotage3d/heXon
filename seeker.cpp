@@ -34,10 +34,12 @@
 #include "player.h"
 
 Seeker::Seeker(Context *context, MasterControl *masterControl, Vector3 position):
-    SceneObject(context, masterControl, "Seeker"),
+    SceneObject(context, masterControl),
     lifeTime_{5.0},
     damage_{1.0}
 {
+    rootNode_->SetName("Seeker");
+
     rootNode_->SetPosition(position);
 
     rigidBody_ = rootNode_->CreateComponent<RigidBody>();
@@ -69,7 +71,7 @@ void Seeker::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
 
     age_ += timeStep;
     if (age_ > lifeTime_ && rootNode_->IsEnabled()) {
-        new HitFX(context_, masterControl_, rootNode_->GetPosition());
+        new HitFX(context_, masterControl_, rootNode_->GetPosition(), false);
         Disable();
     }
 
@@ -90,6 +92,11 @@ void Seeker::HandleTriggerStart(StringHash eventType, VariantMap &eventData)
         RigidBody* collider = collidingBodies[i];
         if (collider->GetNode()->GetNameHash() == N_PLAYER) {
             new HitFX(context_, masterControl_, rootNode_->GetPosition());
+            collider->ApplyImpulse(rigidBody_->GetLinearVelocity()*0.5f);
+            Disable();
+        }
+        else if (collider->GetNode()->GetNameHash() == N_SEEKER){
+            new HitFX(context_, masterControl_, rootNode_->GetPosition(), false);
             Disable();
         }
     }

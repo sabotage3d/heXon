@@ -49,12 +49,18 @@ public:
     double GetHealth(){return health_;}
     void Hit(float damage, int ownerID);
     void AddScore(int points);
+    void Pickup(const StringHash nameHash);
 private:
-    double health_ = 1;
-    double initialHealth_ = 1;
+    double initialHealth_;
+    double health_;
     int firstHitBy_ = 0;
     int lastHitBy_ = 0;
-    int score_ = 0;
+    int score_;
+    int weaponLevel_;
+    int bulletAmount_;
+
+    int appleCount_ = 0;
+    int heartCount_ = 0;
 
     const double shotInterval_ = 0.23;
     double sinceLastShot_ = 0.0;
@@ -62,9 +68,11 @@ private:
     StaticModel* model_;
     RigidBody* rigidBody_;
 
-    SharedPtr<Sound> sample_;
+    SharedPtr<Sound> shot_;
     Vector<SharedPtr<SoundSource> > sampleSources_;
 
     void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
     void PlaySample(Sound *sample);
+    void FireBullet(const Vector3 fire, const float angle);
+    void UpgradeWeapons();
 };

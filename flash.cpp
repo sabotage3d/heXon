@@ -27,9 +27,11 @@
 #include "flash.h"
 
 Flash::Flash(Context *context, MasterControl *masterControl, Vector3 position):
-    Effect(context, masterControl, position, "Flash"),
+    Effect(context, masterControl, position),
     initialBrightness_{2.0}
 {
+    rootNode_->SetName("Flash");
+
     rootNode_->SetPosition(position);
 
     particleEmitter_ = rootNode_->CreateComponent<ParticleEmitter>();

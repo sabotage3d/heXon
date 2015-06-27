@@ -34,10 +34,13 @@
 #include "tilemaster.h"
 #include "pickup.h"
 #include "spawnmaster.h"
+#include "player.h"
 
 Pickup::Pickup(Context *context, MasterControl *masterControl):
-    SceneObject(context, masterControl, "Pickup")
+    SceneObject(context, masterControl)
 {
+    rootNode_->SetName("Pickup");
+
     model_ = rootNode_->CreateComponent<StaticModel>();
     rootNode_->SetScale(0.8);
 
@@ -94,6 +97,8 @@ void Pickup::HandleTriggerStart(StringHash eventType, VariantMap &eventData)
             rigidBody_->SetLinearVelocity(Vector3::ZERO);
             rigidBody_->ResetForces();
             sampleSource_->Play(sample_);
+
+            masterControl_->player_->Pickup(rootNode_->GetNameHash());
         }
     }
 }
@@ -106,11 +111,7 @@ void Pickup::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
     //Emerge
     if (rootNode_->GetPosition().y_ < -0.1f) {
         rootNode_->Translate(Vector3::UP * timeStep * (0.25f - rootNode_->GetPosition().y_));
-        //topRenderer.materials[1].color = randomColor * 0.25f;
     }
     triggerBody_->SetPosition(rootNode_->GetPosition());
-    /*Vector3 pos = rootNode_->GetPosition();
-    if (pos.y_ < 0.0) rootNode_->SetPosition(Vector3::UP*pow(pos.y_,2.0f)*timeStep+pos);
-    if (pos.y_ > 0.0) rootNode_->SetPosition(Vector3::Scale(Vector3::ONE - Vector3::UP, pos));*/
 }
 

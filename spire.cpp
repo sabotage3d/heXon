@@ -29,10 +29,12 @@
 #include "spire.h"
 
 Spire::Spire(Context *context, MasterControl *masterControl, Vector3 position):
-    Enemy(context, masterControl, position, "Spire"),
+    Enemy(context, masterControl, position),
     shotInterval_{2.3f},
     sinceLastShot_{0.0f}
 {
+    rootNode_->SetName("Spire");
+
     health_ = initialHealth_ = 5.0;
     worth_ = 10;
     mass_ = 3.0f;
