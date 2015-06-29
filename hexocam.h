@@ -49,11 +49,11 @@ public:
 
     Vector3 GetWorldPosition();
     Quaternion GetRotation();
+    void SetGreyScale(bool enabled);
 private:
     MasterControl* masterControl_;
     void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
-    SharedPtr<Node> translationNode_;
-    SharedPtr<Node> rotationNode_;
+    SharedPtr<Node> rootNode_;
 
     SharedPtr<RigidBody> rigidBody_;
     double yaw_ = 0.0;

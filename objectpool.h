@@ -34,4 +34,5 @@ class ObjectPool : public Object
 {
 public:
     ObjectPool(Context *context, MasterControl *masterControl);
+private:
 };

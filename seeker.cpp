@@ -91,6 +91,7 @@ void Seeker::HandleTriggerStart(StringHash eventType, VariantMap &eventData)
     for (int i = 0; i < collidingBodies.Length(); i++) {
         RigidBody* collider = collidingBodies[i];
         if (collider->GetNode()->GetNameHash() == N_PLAYER) {
+            masterControl_->player_->Hit(2.3f);
             new HitFX(context_, masterControl_, rootNode_->GetPosition());
             collider->ApplyImpulse(rigidBody_->GetLinearVelocity()*0.5f);
             Disable();

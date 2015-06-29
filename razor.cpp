@@ -60,10 +60,8 @@ void Razor::HandleRazorUpdate(StringHash eventType, VariantMap &eventData)
     //Spin
     topNode_->Rotate(Quaternion(0.0f, timeStep*50.0f*aimSpeed_, 0.0f));
     bottomNode_->Rotate(Quaternion(0.0f, timeStep*-50.0f*aimSpeed_, 0.0f));
-    //Flicker
-
+    //Pulse
     topModel_->GetMaterial()->SetShaderParameter("MatEmissiveColor", GetGlowColor());
-
     //Emerge
     if (rootNode_->GetPosition().y_ < -0.1f) {
         rootNode_->Translate(Vector3::UP * timeStep * (0.25f - rootNode_->GetPosition().y_));
@@ -86,6 +84,12 @@ void Razor::Hit(float damage, int ownerID)
 {
     Enemy::Hit(damage, ownerID);
     aimSpeed_ = (0.25 + 0.75 * panic_) * topSpeed_;
+}
+
+void Razor::Set(Vector3 position)
+{
+    aimSpeed_ = 0.25 * topSpeed_;
+    Enemy::Set(position);
 }
 
 

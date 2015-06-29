@@ -43,9 +43,9 @@ public:
     void Hit(float damage, int ownerID);
     void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
 protected:
-    float panicTime_ = 0.0;
-    float health_ = 1;
-    float initialHealth_ = 1;
+    float panicTime_ = 0.0f;
+    float health_;
+    float initialHealth_;
     float panic_ = 0.0f;
     float mass_;
     int worth_ = 5;
@@ -60,4 +60,6 @@ protected:
     void CheckHealth();
     void Set(Vector3 position);
     Color GetGlowColor();
+private:
+    void Disable();
 };

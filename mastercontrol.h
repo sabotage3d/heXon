@@ -51,6 +51,7 @@ typedef struct GameWorld
 {
     SharedPtr<heXoCam> camera;
     SharedPtr<Scene> scene;
+    float lastReset;
     SharedPtr<Octree> octree;
     SharedPtr<Node> backdropNode;
     SharedPtr<Node> voidNode;
@@ -78,6 +79,8 @@ StringHash const N_PLAYER = StringHash("Player");
 StringHash const N_APPLE = StringHash("Apple");
 StringHash const N_HEART = StringHash("Heart");
 StringHash const N_SEEKER = StringHash("Seeker");
+StringHash const N_SPIRE = StringHash("Spire");
+StringHash const N_RAZOR = StringHash("Razor");
 }
 
 enum JoyStickButton {JB_SELECT, JB_LEFTSTICK, JB_RIGHTSTICK, JB_START, JB_DPAD_UP, JB_DPAD_RIGHT, JB_DPAD_DOWN, JB_DPAD_LEFT, JB_L2, JB_R2, JB_L1, JB_R1, JB_TRIANGLE, JB_CIRCLE, JB_CROSS, JB_SQUARE};

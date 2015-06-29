@@ -170,8 +170,7 @@ void InputMaster::HandleKeyDown(StringHash eventType, VariantMap &eventData)
         screenshot.SavePNG(fileName);
     }
     //Pause/Unpause game on P or joystick Start
-    else if (key == KEY_P ||
-             ( input_->GetJoystick(0) && input_->GetJoystick(0)->GetButtonDown(9) ))
+    else if (key == KEY_P)
     {
         masterControl_->SetPaused(!masterControl_->GetPaused());
     }
@@ -194,9 +193,9 @@ void InputMaster::HandleJoystickButtonDown(Urho3D::StringHash eventType, Urho3D:
     eventData[P_JOYSTICKID];		//int
     int button = eventData[P_BUTTON].GetInt();		//int
     // Process game event
-    if(_controllerActions.Contains(button))
+    if(button == JB_START)
     {
-        //SendButtonDownEvent(_controllerActions[button]);
+        masterControl_->SetPaused(!masterControl_->GetPaused());
     }
 }
 

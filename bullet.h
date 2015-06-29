@@ -29,12 +29,15 @@ class Sprite;
 class Bullet : public SceneObject
 {
     friend class Player;
+    friend class SpawnMaster;
     OBJECT(Bullet);
 public:
     Bullet(Context *context, MasterControl* masterControl);
 protected:
     SharedPtr<RigidBody> rigidBody_;
     SharedPtr<StaticModel> model_;
+
+    void Set(Vector3 position);
     void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
 private:
     double age_ = 0.0;

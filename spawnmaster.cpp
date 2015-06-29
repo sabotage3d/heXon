@@ -24,10 +24,10 @@
 
 SpawnMaster::SpawnMaster(Context *context, MasterControl *masterControl):
     Object(context),
-    RazorInterval_{5.0},
-    sinceRazorSpawn_{RazorInterval_-2.0f},
-    SpireInterval_{23.0},
-    sinceSpireSpawn_{SpireInterval_}
+    razorInterval_{2.0},
+    sinceRazorSpawn_{0.0},
+    spireInterval_{23.0},
+    sinceSpireSpawn_{0.0}
 {
     masterControl_ = masterControl;
 
@@ -53,20 +53,92 @@ void SpawnMaster::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
     sinceRazorSpawn_ += timeStep;
     sinceSpireSpawn_ += timeStep;
 
-    if (sinceRazorSpawn_ > RazorInterval_) SpawnRazor(CreateSpawnPoint());
-    if (sinceSpireSpawn_ > SpireInterval_) SpawnSpire(CreateSpawnPoint());
+    if (sinceRazorSpawn_ > razorInterval_/* &&
+            CountActiveRazors() < 23*/)
+        SpawnRazor(CreateSpawnPoint());
+    if (sinceSpireSpawn_ > spireInterval_/* &&
+            CountActiveSpires() < 7*/)
+        SpawnSpire(CreateSpawnPoint());
+}
+
+int SpawnMaster::CountActiveRazors()
+{
+    int razorCount = 0;
+    for (int r = 0; r < razors_.Values().Length(); r++){
+        if (razors_[r]->rootNode_->IsEnabled()) ++razorCount;
+    }
+    return razorCount;
+}
+int SpawnMaster::CountActiveSpires()
+{
+    int spireCount = 0;
+    for (int s = 0; s < spires_.Values().Length(); s++){
+        if (spires_[s]->rootNode_->IsEnabled()) ++spireCount;
+    }
+    return spireCount;
 }
 
 void SpawnMaster::SpawnRazor(Vector3 position)
 {
     sinceRazorSpawn_ = 0.0;
-    Razor* newRazor = new Razor(context_, masterControl_, position);
-    razors_[newRazor->rootNode_->GetID()] = SharedPtr<Razor>(newRazor);
+    if (!RespawnRazor(position)){
+        Razor* newRazor = new Razor(context_, masterControl_, position);
+        razors_[newRazor->rootNode_->GetID()] = SharedPtr<Razor>(newRazor);
+    }
+    razorInterval_ = 7.0 * pow(0.95, ((masterControl_->world.scene->GetElapsedTime() - masterControl_->world.lastReset) + 10.0) / 10.0);
+}
+bool SpawnMaster::RespawnRazor(Vector3 position)
+{
+    Vector<SharedPtr<Razor> > razors = razors_.Values();
+    for (int r = 0; r < razors.Length(); r++){
+        if (!razors[r]->rootNode_->IsEnabled()){
+            SharedPtr<Razor> razor = razors[r];
+            razor->Set(position);
+            return true;
+        }
+    }
+    return false;
 }
 
 void SpawnMaster::SpawnSpire(Vector3 position)
 {
     sinceSpireSpawn_ = 0.0;
-    Spire* newSpire = new Spire(context_, masterControl_, position);
-    spires_[newSpire->rootNode_->GetID()] = SharedPtr<Spire>(newSpire);
+    if (!RespawnSpire(position)){
+        Spire* newSpire = new Spire(context_, masterControl_, position);
+        spires_[newSpire->rootNode_->GetID()] = SharedPtr<Spire>(newSpire);
+    }
+    spireInterval_ = 23.0 * pow(0.95, ((masterControl_->world.scene->GetElapsedTime() - masterControl_->world.lastReset) + 42.0) / 42.0);
 }
+bool SpawnMaster::RespawnSpire(Vector3 position)
+{
+    Vector<SharedPtr<Spire> > spires = spires_.Values();
+    for (int s = 0; s < spires.Length(); s++){
+        if (!spires[s]->rootNode_->IsEnabled()){
+            SharedPtr<Spire> spire = spires[s];
+            spire->Set(position);
+            return true;
+        }
+    }
+    return false;
+}
+
+Bullet* SpawnMaster::SpawnBullet(Vector3 position)
+{
+    Bullet* bullet = RespawnBullet();
+    if (bullet == nullptr){
+        bullet = new Bullet(context_, masterControl_);
+        bullets_.Push(SharedPtr<Bullet>(bullet));
+    }
+    bullet->Set(position);
+    return bullet;
+}
+Bullet* SpawnMaster::RespawnBullet()
+{
+    for (int b = 0; b < bullets_.Length(); b++){
+        if (!bullets_[b]->rootNode_->IsEnabled()){
+            return bullets_[b];
+        }
+    }
+}
+
+

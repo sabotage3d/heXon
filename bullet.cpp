@@ -37,7 +37,7 @@
 Bullet::Bullet(Context *context, MasterControl *masterControl):
     SceneObject(context, masterControl),
     lifeTime_{1.0f},
-    damage_{0.25f}
+    damage_{0.0f}
 {
     rootNode_->SetName("Bullet");
     rootNode_->SetScale(Vector3(1.0f, 1.0f, 0.1f));
@@ -55,8 +55,6 @@ Bullet::Bullet(Context *context, MasterControl *masterControl):
     light->SetColor(Color(0.6f, 1.0f, 0.2f));
 
     SubscribeToEvent(E_SCENEUPDATE, HANDLER(Bullet, HandleSceneUpdate));
-
-    masterControl_->tileMaster_->AddToAffectors(WeakPtr<Node>(rootNode_), WeakPtr<RigidBody>(rigidBody_));
 }
 
 void Bullet::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
@@ -75,6 +73,18 @@ void Bullet::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
     }
 
     if (timeStep > 0.0f && !fading_) HitCheck(timeStep);
+}
+
+void Bullet::Set(Vector3 position)
+{
+    age_ = 0.0;
+    timeSinceHit_ = 0.0;
+    fading_ = false;
+
+    rigidBody_->SetLinearVelocity(Vector3::ZERO);
+    rigidBody_->ResetForces();
+    SceneObject::Set(position);
+    masterControl_->tileMaster_->AddToAffectors(WeakPtr<Node>(rootNode_), WeakPtr<RigidBody>(rigidBody_));
 }
 
 void Bullet::Disable()
@@ -101,7 +111,6 @@ void Bullet::HitCheck(float timeStep) {
                     else if(masterControl_->spawnMaster_->razors_.Keys().Contains(hitID)){
                         masterControl_->spawnMaster_->razors_[hitID]->Hit(damage_, 1);
                     }
-
                     Disable();
                 }
             }

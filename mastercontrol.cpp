@@ -79,8 +79,8 @@ void MasterControl::Setup()
     engineParameters_["LogName"] = GetSubsystem<FileSystem>()->GetAppPreferencesDir("urho3d", "logs")+"heXon.log";
     engineParameters_["FullScreen"] = true;
     engineParameters_["Headless"] = false;
-    engineParameters_["WindowWidth"] = 1280;
-    engineParameters_["WindowHeight"] = 720;
+    engineParameters_["WindowWidth"] = 1920;
+    engineParameters_["WindowHeight"] = 1080;
 }
 void MasterControl::Start()
 {
@@ -149,14 +149,14 @@ void MasterControl::CreateUI()
     world.cursor.uiCursor->SetPosition(graphics_->GetWidth()/2, graphics_->GetHeight()/2);
 
     //Construct new Text object, set string to display and font to use
-    Text* instructionText = ui_->GetRoot()->CreateChild<Text>();
+    /*Text* instructionText = ui_->GetRoot()->CreateChild<Text>();
     instructionText->SetText("heXon");
     instructionText->SetFont(cache_->GetResource<Font>("Resources/Fonts/skirmishergrad.ttf"), 32);
     instructionText->SetColor(Color(0.0f, 0.75f, 1.0f, 0.5f));
     //The text has multiple rows. Center them in relation to each other
     instructionText->SetHorizontalAlignment(HA_CENTER);
     instructionText->SetVerticalAlignment(VA_CENTER);
-    instructionText->SetPosition(0, ui_->GetRoot()->GetHeight()/2.1);
+    instructionText->SetPosition(0, ui_->GetRoot()->GetHeight()/2.1);*/
 }
 
 void MasterControl::CreateScene()
@@ -246,10 +246,10 @@ void MasterControl::UpdateCursor(double timeStep)
         {
             if (world.cursor.hitResults[i].node_->GetNameHash() == N_VOID)
             {
-                Vector3 camHitDifference = world.camera->translationNode_->GetWorldPosition() - world.cursor.hitResults[i].position_;
-                camHitDifference /= world.camera->translationNode_->GetWorldPosition().y_ - world.voidNode->GetPosition().y_;
-                camHitDifference *= world.camera->translationNode_->GetWorldPosition().y_;
-                world.cursor.sceneCursor->SetWorldPosition(world.camera->translationNode_->GetWorldPosition()-camHitDifference);
+                Vector3 camHitDifference = world.camera->rootNode_->GetWorldPosition() - world.cursor.hitResults[i].position_;
+                camHitDifference /= world.camera->rootNode_->GetWorldPosition().y_ - world.voidNode->GetPosition().y_;
+                camHitDifference *= world.camera->rootNode_->GetWorldPosition().y_;
+                world.cursor.sceneCursor->SetWorldPosition(world.camera->rootNode_->GetWorldPosition()-camHitDifference);
             }
         }
     }
@@ -281,7 +281,6 @@ bool MasterControl::PhysicsSphereCast(PODVector<RigidBody*> &hitResults, Vector3
 
 void MasterControl::Exit()
 {
-
     engine_->Exit();
 }
 

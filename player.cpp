@@ -32,10 +32,13 @@
 #include <Urho3D/Audio/SoundSource.h>
 
 #include "mastercontrol.h"
+#include "spawnmaster.h"
 #include "tilemaster.h"
 #include "player.h"
 #include "bullet.h"
 #include "muzzle.h"
+#include "hexocam.h"
+#include "explosion.h"
 
 Player::Player(Context *context, MasterControl *masterControl):
     SceneObject(context, masterControl),
@@ -47,6 +50,33 @@ Player::Player(Context *context, MasterControl *masterControl):
 {
     rootNode_->SetName("Player");
 
+    healthBarNode_ = masterControl_->world.scene->CreateChild("HealthBar");
+    healthBarNode_->SetPosition(0.0f, 1.0f, 21.0f);
+    healthBarNode_->SetScale(10.0f, 1.0f, 1.0f);
+    StaticModel* healthBarModel = healthBarNode_->CreateComponent<StaticModel>();
+    healthBarModel->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Bar.mdl"));
+    healthBarModel->SetMaterial(masterControl_->cache_->GetResource<Material>("Resources/Materials/GreenGlowEnvmap.xml"));
+
+    appleCounterRoot_ = masterControl_->world.scene->CreateChild("AppleCounter");
+    for (int a = 0; a < 5; a++){
+        appleCounter_[a] = appleCounterRoot_->CreateChild();
+        appleCounter_[a]->SetPosition(-((float)a + 8.0f), 1.0f, 21.0f);
+        appleCounter_[a]->SetScale(0.5f);
+        StaticModel* apple = appleCounter_[a]->CreateComponent<StaticModel>();
+        apple->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Apple.mdl"));
+        apple->SetMaterial(masterControl_->cache_->GetTempResource<Material>("Resources/Materials/GoldEnvmap.xml"));
+    }
+
+    heartCounterRoot_ = masterControl_->world.scene->CreateChild("HeartCounter");
+    for (int h = 0; h < 5; h++){
+        heartCounter_[h] = heartCounterRoot_->CreateChild();
+        heartCounter_[h]->SetPosition((float)h + 8.0f, 1.0f, 21.0f);
+        heartCounter_[h]->SetScale(0.5f);
+        StaticModel* heart = heartCounter_[h]->CreateComponent<StaticModel>();
+        heart->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Heart.mdl"));
+        heart->SetMaterial(masterControl_->cache_->GetTempResource<Material>("Resources/Materials/RedEnvmap.xml"));
+    }
+
     model_ = rootNode_->CreateComponent<StaticModel>();
     model_->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Swift.mdl"));
     model_->SetMaterial(0, masterControl_->cache_->GetTempResource<Material>("Resources/Materials/GreenGlowEnvmap.xml"));
@@ -57,7 +87,6 @@ Player::Player(Context *context, MasterControl *masterControl):
     rigidBody_->SetMass(1.0f);
     rigidBody_->SetLinearFactor(Vector3::ONE - Vector3::UP);
     rigidBody_->SetLinearDamping(0.5f);
-    //rigidBody_->ApplyForce(Vector3::LEFT*100);
     rigidBody_->SetAngularFactor(Vector3::ZERO);
     rigidBody_->SetLinearRestThreshold(0.01f);
     rigidBody_->SetAngularRestThreshold(0.1f);
@@ -84,12 +113,16 @@ Player::Player(Context *context, MasterControl *masterControl):
 
     masterControl_->tileMaster_->AddToAffectors(WeakPtr<Node>(rootNode_), WeakPtr<RigidBody>(rigidBody_));
 
-    /*scoreText_ = masterControl_->ui_->GetRoot()->CreateChild<Text>();
-    scoreText_->SetText(String(score_));
-    scoreText_->SetFont(masterControl_->cache_->GetResource<Font>("Resources/Fonts/skirmishergrad.ttf"), 32);
-    scoreText_->SetHorizontalAlignment(HA_LEFT);
-    scoreText_->SetVerticalAlignment(VA_TOP);
-    scoreText_->SetPosition(0, masterControl_->ui_->GetRoot()->GetHeight()/2.1);*/
+    UI* ui = GetSubsystem<UI>();
+    Text* scoreText = ui->GetRoot()->CreateChild<Text>();
+    scoreText->SetName("Score");
+    scoreTextName_ = scoreText->GetName();
+    scoreText->SetText("0");
+    scoreText->SetFont(masterControl_->cache_->GetResource<Font>("Resources/Fonts/skirmishergrad.ttf"), 32);
+    scoreText->SetColor(Color(0.23f, 0.75f, 1.0f, 0.75f));
+    scoreText->SetHorizontalAlignment(HA_CENTER);
+    scoreText->SetVerticalAlignment(VA_CENTER);
+    scoreText->SetPosition(0, ui->GetRoot()->GetHeight()/2.2);
 
     SubscribeToEvent(E_SCENEUPDATE, HANDLER(Player, HandleSceneUpdate));
 }
@@ -97,6 +130,10 @@ Player::Player(Context *context, MasterControl *masterControl):
 void Player::AddScore(int points)
 {
     score_ += points;
+    UI* ui = GetSubsystem<UI>();
+    UIElement* scoreElement = ui->GetRoot()->GetChild(scoreTextName_);
+    Text* scoreText = (Text*)scoreElement;
+    scoreText->SetText(String(score_));
 }
 
 void Player::PlaySample(Sound* sample)
@@ -111,6 +148,7 @@ void Player::PlaySample(Sound* sample)
 
 void Player::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
 {
+    if (!rootNode_->IsEnabled()) return;
     using namespace Update;
 
     //Take the frame time step, which is stored as a double
@@ -122,8 +160,8 @@ void Player::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
     Vector3 move = Vector3::ZERO;
     Vector3 moveJoy = Vector3::ZERO;
     Vector3 moveKey = Vector3::ZERO;
-    double thrust = 2358.0;
-    double maxSpeed = 21.0;
+    double thrust = 2323.0;
+    double maxSpeed = 23.0;
     //Firing values
     Vector3 fire = Vector3::ZERO;
     Vector3 fireJoy = Vector3::ZERO;
@@ -140,10 +178,14 @@ void Player::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
             Vector3::RIGHT * input->GetKeyDown(KEY_D) +
             Vector3::FORWARD * input->GetKeyDown(KEY_W) +
             Vector3::BACK * input->GetKeyDown(KEY_S);
-    fireKey = Vector3::LEFT * input->GetKeyDown(KEY_J) +
-            Vector3::RIGHT * input->GetKeyDown(KEY_L) +
-            Vector3::FORWARD * input->GetKeyDown(KEY_I) +
-            Vector3::BACK * input->GetKeyDown(KEY_K);
+    fireKey = Vector3::LEFT * (input->GetKeyDown(KEY_J) || input->GetKeyDown(KEY_KP_4)) +
+            Vector3::RIGHT * (input->GetKeyDown(KEY_L) || input->GetKeyDown(KEY_KP_6)) +
+            Vector3::FORWARD * (input->GetKeyDown(KEY_I) || input->GetKeyDown(KEY_KP_8)) +
+            Vector3::BACK * (input->GetKeyDown(KEY_K) || input->GetKeyDown(KEY_KP_2) || input->GetKeyDown(KEY_KP_5)) +
+            Quaternion(45.0f, Vector3::UP)*Vector3::LEFT * input->GetKeyDown(KEY_KP_7) +
+            Quaternion(45.0f, Vector3::UP)*Vector3::RIGHT * input->GetKeyDown(KEY_KP_3) +
+            Quaternion(45.0f, Vector3::UP)*Vector3::FORWARD * input->GetKeyDown(KEY_KP_9) +
+            Quaternion(45.0f, Vector3::UP)*Vector3::BACK * input->GetKeyDown(KEY_KP_1);
 
     //Pick most significant input
     moveJoy.Length() > moveKey.Length() ? move = moveJoy : move = moveKey;
@@ -165,7 +207,7 @@ void Player::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
     }
 
     //Update rotation according to direction of the ship's movement.
-    if (rigidBody_->GetLinearVelocity().Length() > 0.1)
+    if (rigidBody_->GetLinearVelocity().Length() > 0.1f)
         rootNode_->LookAt(rootNode_->GetPosition()+rigidBody_->GetLinearVelocity());
 
     //Shooting
@@ -208,8 +250,8 @@ void Player::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
 
 void Player::FireBullet(const Vector3 fire, const float angle){
     Vector3 direction = Quaternion(angle, Vector3::UP) * fire;
-    Bullet* bullet = new Bullet(context_, masterControl_);
-    bullet->rootNode_->SetPosition(rootNode_->GetPosition() + direction);
+    Bullet* bullet = masterControl_->spawnMaster_->SpawnBullet(rootNode_->GetPosition() + direction);
+    bullet->Set(rootNode_->GetPosition() + direction);
     bullet->rootNode_->LookAt(bullet->rootNode_->GetPosition() + direction*5.0f);
     bullet->rigidBody_->ApplyForce(direction*1500.0f);
     bullet->damage_ = 0.15f + 0.005f * weaponLevel_;
@@ -221,7 +263,7 @@ void Player::Pickup(const StringHash nameHash)
         bulletAmount_ = (bulletAmount_ == 0)?1:bulletAmount_;
         ++appleCount_;
         heartCount_ = 0;
-        score_ += 23;
+        AddScore(23);
         if (appleCount_ >= 5){
             appleCount_ = 0;
             UpgradeWeapons();
@@ -232,10 +274,41 @@ void Player::Pickup(const StringHash nameHash)
         appleCount_ = 0;
         if (heartCount_ >= 5){
             heartCount_ = 0;
-            health_ = 15.0;
+            SetHealth(15.0);
         }
-        else health_ = Max(health_, Clamp(health_+5.0, 0.0, 10.0));
+        else SetHealth(Max(health_, Clamp(health_+5.0, 0.0, 10.0)));
     }
+
+    for (int a = 0; a < 5; a++){
+        if (appleCount_ > a) appleCounter_[a]->SetEnabled(true);
+        else appleCounter_[a]->SetEnabled(false);
+    }
+    for (int h = 0; h < 5; h++){
+        if (heartCount_ > h) heartCounter_[h]->SetEnabled(true);
+        else heartCounter_[h]->SetEnabled(false);
+    }
+}
+
+void Player::Die()
+{
+    Disable();
+    new Explosion(context_, masterControl_, rootNode_->GetPosition(), Color::GREEN, 5.0f);
+    //masterControl_->world.camera->SetGreyScale(true);
+}
+
+void Player::SetHealth(float life)
+{
+    health_ = Clamp(life, 0.0f, 15.0f);
+    healthBarNode_->SetScale(health_, 1.0f, 1.0f);
+
+    if (health_ <= 0.0f){
+        Die();
+    }
+}
+
+void Player::Hit(float damage)
+{
+    SetHealth(health_ - damage);
 }
 
 void Player::UpgradeWeapons()

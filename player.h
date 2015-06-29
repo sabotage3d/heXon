@@ -44,17 +44,15 @@ class Player : public SceneObject
     OBJECT(Player);
 public:
     Player(Context* context, MasterControl* masterControl);
-    SharedPtr<Text> scoreText_;
 
     double GetHealth(){return health_;}
-    void Hit(float damage, int ownerID);
+    void Hit(float damage);
     void AddScore(int points);
     void Pickup(const StringHash nameHash);
+    void Die();
 private:
     double initialHealth_;
     double health_;
-    int firstHitBy_ = 0;
-    int lastHitBy_ = 0;
     int score_;
     int weaponLevel_;
     int bulletAmount_;
@@ -68,11 +66,21 @@ private:
     StaticModel* model_;
     RigidBody* rigidBody_;
 
+    Node* healthBarNode_;
+
+    Node* appleCounterRoot_;
+    Node* appleCounter_[5];
+    Node* heartCounterRoot_;
+    Node* heartCounter_[5];
+
     SharedPtr<Sound> shot_;
     Vector<SharedPtr<SoundSource> > sampleSources_;
+
+    String scoreTextName_;
 
     void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
     void PlaySample(Sound *sample);
     void FireBullet(const Vector3 fire, const float angle);
     void UpgradeWeapons();
+    void SetHealth(float life);
 };

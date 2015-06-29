@@ -40,6 +40,7 @@ class Razor : public Enemy
 public:
     Razor(Context* context, MasterControl* masterControl, Vector3 position);
     void Hit(float damage, int ownerID);
+    void Set(Vector3 position);
 protected:
     double topSpeed_;
     double aimSpeed_;

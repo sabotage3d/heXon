@@ -34,15 +34,16 @@
 
 Enemy::Enemy(Context *context, MasterControl *masterControl, Vector3 position):
     SceneObject(context, masterControl),
+    initialHealth_{1.0f},
     mass_{2.0f}
 {
+    health_ = initialHealth_;
     rootNode_->SetName("Enemy");
 
     rootNode_->SetPosition(position);
     //Generate random color
     int randomizer = Random(6);
     color_ = Color(0.5f + (randomizer * 0.075f), 0.9f - (randomizer * 0.075f), 0.5+Max(randomizer-3.0, 3.0)/6.0, 1.0f);
-    //color_ = Color(1.0f, 0.5f, 1.0f);
 
     particleNode_ = rootNode_->CreateChild("SmokeTrail");
     ParticleEmitter* particleEmitter = particleNode_->CreateComponent<ParticleEmitter>();
@@ -75,11 +76,18 @@ Enemy::Enemy(Context *context, MasterControl *masterControl, Vector3 position):
 
 void Enemy::Set(Vector3 position)
 {
+    rigidBody_->SetLinearVelocity(Vector3::ZERO);
+    rigidBody_->ResetForces();
     rigidBody_->SetMass(mass_);
     masterControl_->tileMaster_->AddToAffectors(WeakPtr<Node>(rootNode_), WeakPtr<RigidBody>(rigidBody_));
+
     firstHitBy_ = lastHitBy_ = 0;
     bonus_ = true;
     health_ = initialHealth_;
+    panic_ = 0.0f;
+
+    ParticleEmitter* particleEmitter = particleNode_->GetComponent<ParticleEmitter>();
+    particleEmitter->RemoveAllParticles();
     SceneObject::Set(position);
 }
 
@@ -99,11 +107,16 @@ void Enemy::CheckHealth()
 {
     //Die
     if (rootNode_->IsEnabled() && health_ <= 0.0) {
-        masterControl_->player_->AddScore(worth_);
+        masterControl_->player_->AddScore(bonus_ ? worth_ : 2 * worth_ / 3);
         Explosion* newExplosion = new Explosion(context_, masterControl_, rootNode_->GetPosition(), Color(color_.r_*color_.r_, color_.g_*color_.g_, color_.b_*color_.b_), 0.5f*mass_);
         newExplosion->rigidBody_->SetLinearVelocity(rigidBody_->GetLinearVelocity());
         Disable();
     }
+}
+
+void Enemy::Disable()
+{
+    SceneObject::Disable();
 }
 
 Color Enemy::GetGlowColor()

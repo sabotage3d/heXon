@@ -82,7 +82,7 @@ void Explosion::UpdateExplosion(StringHash eventType, VariantMap& eventData)
     rigidBody_->SetMass(Max(initialMass_*((0.1 - age_)/0.1),0.01));
     light_->SetBrightness(Max(initialBrightness_*(0.32 - age_)/0.32,0.0));
 
-    if (rootNode_->IsEnabled()) {
+    if (rootNode_->IsEnabled() && masterControl_->world.scene->IsUpdateEnabled()) {
         PODVector<RigidBody* > hitResults;
         float radius = 2.0f*initialMass_ + age_*7.0f;
         if (masterControl_->PhysicsSphereCast(hitResults,rootNode_->GetPosition(), radius, M_MAX_UNSIGNED)){

@@ -39,20 +39,19 @@ heXoCam::heXoCam(Context *context, MasterControl *masterControl):
     SubscribeToEvent(E_SCENEUPDATE, HANDLER(heXoCam, HandleSceneUpdate));
 
     //Create the camera. Limit far clip distance to match the fog
-    translationNode_ = masterControl_->world.scene->CreateChild("CamTrans");
-    rotationNode_ = translationNode_->CreateChild("CamRot");
-    camera_ = rotationNode_->CreateComponent<Camera>();
+    rootNode_ = masterControl_->world.scene->CreateChild("Camera");
+    camera_ = rootNode_->CreateComponent<Camera>();
     camera_->SetFarClip(1024.0f);
     //Set an initial position for the camera scene node above the origin
-    translationNode_->SetPosition(Vector3(0.0f, 42.0f, -23.0f));
-    rotationNode_->SetRotation(Quaternion(65.0f, 0.0f, 0.0f));
-    rigidBody_ = translationNode_->CreateComponent<RigidBody>();
+    rootNode_->SetPosition(Vector3(0.0f, 42.0f, -23.0f));
+    rootNode_->SetRotation(Quaternion(65.0f, 0.0f, 0.0f));
+    rigidBody_ = rootNode_->CreateComponent<RigidBody>();
     rigidBody_->SetAngularDamping(10.0f);
-    CollisionShape* collisionShape = translationNode_->CreateComponent<CollisionShape>();
+    CollisionShape* collisionShape = rootNode_->CreateComponent<CollisionShape>();
     collisionShape->SetSphere(0.1f);
     rigidBody_->SetMass(1.0f);
 
-    Node* lightNode = translationNode_->CreateChild("DirectionalLight");
+    Node* lightNode = rootNode_->CreateChild("DirectionalLight");
     lightNode->SetDirection(Vector3(0.0f, -1.0f, 0.0f));
     Light* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_POINT);
@@ -61,6 +60,8 @@ heXoCam::heXoCam(Context *context, MasterControl *masterControl):
     light->SetCastShadows(false);
 
     SetupViewport();
+
+    Node* healthBarNode = rootNode_->CreateChild();
 }
 
 
@@ -90,25 +91,30 @@ void heXoCam::SetupViewport()
     effectRenderPath_->SetShaderParameter("BloomThreshold", 0.23f);
     effectRenderPath_->SetShaderParameter("BloomMix", Vector2(1.75f, 2.25f));
     effectRenderPath_->SetEnabled("Bloom", true);
+    effectRenderPath_->Append(cache->GetResource<XMLFile>("PostProcess/GreyScale.xml"));
+    SetGreyScale(false);
     viewport_->SetRenderPath(effectRenderPath_);
     renderer->SetViewport(0, viewport);
 }
 
 Vector3 heXoCam::GetWorldPosition()
 {
-    return translationNode_->GetWorldPosition();
+    return rootNode_->GetWorldPosition();
 }
 
 Quaternion heXoCam::GetRotation()
 {
-    return rotationNode_->GetRotation();
+    return rootNode_->GetRotation();
 }
 
 void heXoCam::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
 {
     using namespace Update;
 
-    //Take the frame time step, which is stored as a double
-    double timeStep = eventData[P_TIMESTEP].GetFloat();
+    float timeStep = eventData[P_TIMESTEP].GetFloat();
+}
 
+void heXoCam::SetGreyScale(bool enabled)
+{
+    effectRenderPath_->SetEnabled("GreyScale", enabled);
 }

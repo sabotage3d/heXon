@@ -49,7 +49,7 @@ public:
     Node* rootNode_;
     RigidBody* rigidBody_;
 
-    bool CheckEmpty(Vector3 coords, bool checkTiles) const { CheckEmpty(IntVector2(round(coords.x_), round(coords.z_)), checkTiles); }
+    bool CheckEmpty(Vector3 coords, bool checkTiles) const { return CheckEmpty(IntVector2(round(coords.x_), round(coords.z_)), checkTiles); }
     bool CheckEmpty(IntVector2 coords, bool checkTiles) const;
     bool CheckEmptyNeighbour(IntVector2 coords, TileElement element, bool tileMap) const;
     IntVector2 GetNeighbourCoords(IntVector2 coords, TileElement element) const;
@@ -71,7 +71,7 @@ public:
     void EnableSlots();
     void DisableSlots();
 
-    void AddToAffectors(WeakPtr<Node> affector, WeakPtr<RigidBody> rigidBody) { hexAffectors_[affector] = rigidBody; }
+    void AddToAffectors(WeakPtr<Node> affector, WeakPtr<RigidBody> rigidBody) { if (hexAffectors_.Values().Length() <= 23 || affector->GetNameHash() == N_SPIRE) hexAffectors_[affector] = rigidBody; }
     void RemoveFromAffectors(WeakPtr<Node> affector) { if (hexAffectors_.Contains(affector) ) hexAffectors_.Erase(affector); }
     HashMap<WeakPtr<Node>, WeakPtr<RigidBody> >* GetAffectors() { return &hexAffectors_; }
 
