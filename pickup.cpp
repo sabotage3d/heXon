@@ -42,7 +42,7 @@ Pickup::Pickup(Context *context, MasterControl *masterControl):
     rootNode_->SetName("Pickup");
 
     model_ = rootNode_->CreateComponent<StaticModel>();
-    rootNode_->SetScale(0.8);
+    rootNode_->SetScale(0.8f);
 
 
     rigidBody_ = rootNode_->CreateComponent<RigidBody>();

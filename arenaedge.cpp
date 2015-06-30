@@ -40,7 +40,7 @@ ArenaEdge::ArenaEdge(Context* context, MasterControl* masterControl, float yRota
 SceneObject(context, masterControl)
 {
     rootNode_->SetName("ArenaEdge");
-    rootNode_->SetScale(24.0f, 2.0f, 24.0f);
+    rootNode_->SetScale(Vector3(24.0f, 2.0f, 24.0f));
     rootNode_->SetPosition(0.0f, 0.0f, 0.0f);
     rootNode_->SetRotation(Quaternion(0.0f, yRotation, 0.0f));
 

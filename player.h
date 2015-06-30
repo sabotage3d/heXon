@@ -67,6 +67,7 @@ private:
     RigidBody* rigidBody_;
 
     Node* healthBarNode_;
+    StaticModel* healthBarModel_;
 
     Node* appleCounterRoot_;
     Node* appleCounter_[5];

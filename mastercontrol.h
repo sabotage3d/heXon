@@ -118,6 +118,8 @@ public:
     void CreateSineLookupTable();
     double Sine(double x) { return sine_[(int)round(sine_.Length() * Cycle(x/M_PI, 0.0, 1.0))%sine_.Length()]; }
     float Sine(float x) { return sine_[(int)round(sine_.Length() * Cycle(x/M_PI, 0.0, 1.0))%sine_.Length()]; }
+    double Sine(double freq, double min, double max, double shift = 0.0);
+    float Sine(float freq, float min, float max, float shift = 0.0f);
 
     bool GetPaused() { return paused_; }
     void SetPaused(bool paused) { paused_ = paused; world.scene->SetUpdateEnabled(!paused);}

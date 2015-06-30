@@ -50,38 +50,31 @@ Player::Player(Context *context, MasterControl *masterControl):
 {
     rootNode_->SetName("Player");
 
-    healthBarNode_ = masterControl_->world.scene->CreateChild("HealthBar");
-    healthBarNode_->SetPosition(0.0f, 1.0f, 21.0f);
-    healthBarNode_->SetScale(health_, 0.5f, 0.5f);
-    StaticModel* healthBarModel = healthBarNode_->CreateComponent<StaticModel>();
-    healthBarModel->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Bar.mdl"));
-    healthBarModel->SetMaterial(masterControl_->cache_->GetResource<Material>("Resources/Materials/GreenGlowEnvmap.xml"));
-
-    appleCounterRoot_ = masterControl_->world.scene->CreateChild("AppleCounter");
-    for (int a = 0; a < 5; a++){
-        appleCounter_[a] = appleCounterRoot_->CreateChild();
-        appleCounter_[a]->SetPosition(-((float)a + 8.0f), 1.0f, 21.0f);
-        appleCounter_[a]->SetScale(0.333f);
-        StaticModel* apple = appleCounter_[a]->CreateComponent<StaticModel>();
-        apple->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Apple.mdl"));
-        apple->SetMaterial(masterControl_->cache_->GetTempResource<Material>("Resources/Materials/GoldEnvmap.xml"));
-    }
-
-    heartCounterRoot_ = masterControl_->world.scene->CreateChild("HeartCounter");
-    for (int h = 0; h < 5; h++){
-        heartCounter_[h] = heartCounterRoot_->CreateChild();
-        heartCounter_[h]->SetPosition((float)h + 8.0f, 1.0f, 21.0f);
-        heartCounter_[h]->SetScale(0.333f);
-        StaticModel* heart = heartCounter_[h]->CreateComponent<StaticModel>();
-        heart->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Heart.mdl"));
-        heart->SetMaterial(masterControl_->cache_->GetTempResource<Material>("Resources/Materials/RedEnvmap.xml"));
-    }
-
+    //Setup player graphics
     model_ = rootNode_->CreateComponent<StaticModel>();
     model_->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Swift.mdl"));
     model_->SetMaterial(0, masterControl_->cache_->GetTempResource<Material>("Resources/Materials/GreenGlowEnvmap.xml"));
     model_->SetMaterial(1, masterControl_->cache_->GetTempResource<Material>("Resources/Materials/GreenEnvmap.xml"));
 
+    ParticleEmitter* particleEmitter = rootNode_->CreateComponent<ParticleEmitter>();
+    SharedPtr<ParticleEffect> particleEffect = masterControl_->cache_->GetTempResource<ParticleEffect>("Resources/Particles/Shine.xml");
+    Vector<ColorFrame> colorFrames;
+    colorFrames.Push(ColorFrame(Color(0.0f, 0.0f, 0.0f, 0.0f), 0.0f));
+    colorFrames.Push(ColorFrame(Color(0.42f, 0.7f, 0.23f, 0.23f), 0.2f));
+    colorFrames.Push(ColorFrame(Color(0.0f, 0.0f, 0.0f, 0.0f), 0.4f));
+    particleEffect->SetColorFrames(colorFrames);
+    particleEmitter->SetEffect(particleEffect);
+
+    //Setup player audio
+    shot_ = masterControl_->cache_->GetResource<Sound>("Resources/Samples/Shot.ogg");
+    shot_->SetLooped(false);
+    for (int i = 0; i < 3; i++){
+        sampleSources_.Push(SharedPtr<SoundSource>(rootNode_->CreateComponent<SoundSource>()));
+        sampleSources_[i]->SetGain(0.3f);
+        sampleSources_[i]->SetSoundType(SOUND_EFFECT);
+    }
+
+    //Setup player physics
     rigidBody_ = rootNode_->CreateComponent<RigidBody>();
     rigidBody_->SetRestitution(0.666);
     rigidBody_->SetMass(1.0f);
@@ -94,25 +87,9 @@ Player::Player(Context *context, MasterControl *masterControl):
     CollisionShape* collisionShape = rootNode_->CreateComponent<CollisionShape>();
     collisionShape->SetSphere(2.0f);
 
-    ParticleEmitter* particleEmitter = rootNode_->CreateComponent<ParticleEmitter>();
-    SharedPtr<ParticleEffect> particleEffect = masterControl_->cache_->GetTempResource<ParticleEffect>("Resources/Particles/Shine.xml");
-    Vector<ColorFrame> colorFrames;
-    colorFrames.Push(ColorFrame(Color(0.0f, 0.0f, 0.0f, 0.0f), 0.0f));
-    colorFrames.Push(ColorFrame(Color(0.42f, 0.7f, 0.23f, 0.23f), 0.2f));
-    colorFrames.Push(ColorFrame(Color(0.0f, 0.0f, 0.0f, 0.0f), 0.4f));
-    particleEffect->SetColorFrames(colorFrames);
-    particleEmitter->SetEffect(particleEffect);
-
-    shot_ = masterControl_->cache_->GetResource<Sound>("Resources/Samples/Shot.ogg");
-    shot_->SetLooped(false);
-    for (int i = 0; i < 3; i++){
-        sampleSources_.Push(SharedPtr<SoundSource>(rootNode_->CreateComponent<SoundSource>()));
-        sampleSources_[i]->SetGain(0.3f);
-        sampleSources_[i]->SetSoundType(SOUND_EFFECT);
-    }
-
     masterControl_->tileMaster_->AddToAffectors(WeakPtr<Node>(rootNode_), WeakPtr<RigidBody>(rigidBody_));
 
+    //Setup 2D GUI elements
     UI* ui = GetSubsystem<UI>();
     Text* scoreText = ui->GetRoot()->CreateChild<Text>();
     scoreText->SetName("Score");
@@ -124,6 +101,37 @@ Player::Player(Context *context, MasterControl *masterControl):
     scoreText->SetVerticalAlignment(VA_CENTER);
     scoreText->SetPosition(0, ui->GetRoot()->GetHeight()/2.2);
 
+    //Setup 3D GUI elements
+    healthBarNode_ = masterControl_->world.scene->CreateChild("HealthBar");
+    healthBarNode_->SetPosition(0.0f, 1.0f, 21.0f);
+    healthBarNode_->SetScale(health_, 0.5f, 0.5f);
+    healthBarModel_ = healthBarNode_->CreateComponent<StaticModel>();
+    healthBarModel_->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Bar.mdl"));
+    healthBarModel_->SetMaterial(masterControl_->cache_->GetResource<Material>("Resources/Materials/GreenGlowEnvmap.xml"));
+
+    appleCounterRoot_ = masterControl_->world.scene->CreateChild("AppleCounter");
+    for (int a = 0; a < 5; a++){
+        appleCounter_[a] = appleCounterRoot_->CreateChild();
+        appleCounter_[a]->SetEnabled(false);
+        appleCounter_[a]->SetPosition(-((float)a + 8.0f), 1.0f, 21.0f);
+        appleCounter_[a]->SetScale(0.333f);
+        StaticModel* apple = appleCounter_[a]->CreateComponent<StaticModel>();
+        apple->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Apple.mdl"));
+        apple->SetMaterial(masterControl_->cache_->GetTempResource<Material>("Resources/Materials/GoldEnvmap.xml"));
+    }
+
+    heartCounterRoot_ = masterControl_->world.scene->CreateChild("HeartCounter");
+    for (int h = 0; h < 5; h++){
+        heartCounter_[h] = heartCounterRoot_->CreateChild();
+        heartCounter_[h]->SetEnabled(false);
+        heartCounter_[h]->SetPosition((float)h + 8.0f, 1.0f, 21.0f);
+        heartCounter_[h]->SetScale(0.333f);
+        StaticModel* heart = heartCounter_[h]->CreateComponent<StaticModel>();
+        heart->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Heart.mdl"));
+        heart->SetMaterial(masterControl_->cache_->GetTempResource<Material>("Resources/Materials/RedEnvmap.xml"));
+    }
+
+    //Subscribe to events
     SubscribeToEvent(E_SCENEUPDATE, HANDLER(Player, HandleSceneUpdate));
 }
 
@@ -140,7 +148,7 @@ void Player::PlaySample(Sound* sample)
 {
     for (int i = 0; i < sampleSources_.Length(); i++){
         if (!sampleSources_[i]->IsPlaying()){
-            sampleSources_[i]->Play(shot_);
+            sampleSources_[i]->Play(sample);
             break;
         }
     }
@@ -247,8 +255,10 @@ void Player::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
         }
     }
     for (int i = 0; i < 5; i++){
-        appleCounter_[i]->Rotate(Quaternion(0.0f, (i+5) * 23.0f * timeStep, 0.0f));
-        heartCounter_[i]->Rotate(Quaternion(0.0f, (i+5) * 23.0f * timeStep, 0.0f));
+        appleCounter_[i]->Rotate(Quaternion(0.0f, (i*i+10.0f) * 23.0f * timeStep, 0.0f));
+        appleCounter_[i]->SetScale(masterControl_->Sine(2.0f, 0.2f, 0.4, -i/M_TAU));
+        heartCounter_[i]->Rotate(Quaternion(0.0f, (i*i+10.0f) * 23.0f * timeStep, 0.0f));
+        heartCounter_[i]->SetScale(masterControl_->Sine(2.0f, 0.2f, 0.4, -i/M_TAU));
     }
 }
 
@@ -296,14 +306,14 @@ void Player::Pickup(const StringHash nameHash)
 void Player::Die()
 {
     Disable();
-    new Explosion(context_, masterControl_, rootNode_->GetPosition(), Color::GREEN, 5.0f);
+    new Explosion(context_, masterControl_, rootNode_->GetPosition(), Color::GREEN, 2.0f);
     //masterControl_->world.camera->SetGreyScale(true);
 }
 
 void Player::SetHealth(float life)
 {
     health_ = Clamp(life, 0.0f, 15.0f);
-    healthBarNode_->SetScale(health_, 0.5f, 0.5f);
+    healthBarNode_->SetScale(Vector3(health_, 0.5f, 0.5f));
 
     if (health_ <= 0.0f){
         Die();
