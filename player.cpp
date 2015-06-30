@@ -52,7 +52,7 @@ Player::Player(Context *context, MasterControl *masterControl):
 
     healthBarNode_ = masterControl_->world.scene->CreateChild("HealthBar");
     healthBarNode_->SetPosition(0.0f, 1.0f, 21.0f);
-    healthBarNode_->SetScale(10.0f, 1.0f, 1.0f);
+    healthBarNode_->SetScale(health_, 0.5f, 0.5f);
     StaticModel* healthBarModel = healthBarNode_->CreateComponent<StaticModel>();
     healthBarModel->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Bar.mdl"));
     healthBarModel->SetMaterial(masterControl_->cache_->GetResource<Material>("Resources/Materials/GreenGlowEnvmap.xml"));
@@ -61,7 +61,7 @@ Player::Player(Context *context, MasterControl *masterControl):
     for (int a = 0; a < 5; a++){
         appleCounter_[a] = appleCounterRoot_->CreateChild();
         appleCounter_[a]->SetPosition(-((float)a + 8.0f), 1.0f, 21.0f);
-        appleCounter_[a]->SetScale(0.5f);
+        appleCounter_[a]->SetScale(0.333f);
         StaticModel* apple = appleCounter_[a]->CreateComponent<StaticModel>();
         apple->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Apple.mdl"));
         apple->SetMaterial(masterControl_->cache_->GetTempResource<Material>("Resources/Materials/GoldEnvmap.xml"));
@@ -71,7 +71,7 @@ Player::Player(Context *context, MasterControl *masterControl):
     for (int h = 0; h < 5; h++){
         heartCounter_[h] = heartCounterRoot_->CreateChild();
         heartCounter_[h]->SetPosition((float)h + 8.0f, 1.0f, 21.0f);
-        heartCounter_[h]->SetScale(0.5f);
+        heartCounter_[h]->SetScale(0.333f);
         StaticModel* heart = heartCounter_[h]->CreateComponent<StaticModel>();
         heart->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Heart.mdl"));
         heart->SetMaterial(masterControl_->cache_->GetTempResource<Material>("Resources/Materials/RedEnvmap.xml"));
@@ -246,6 +246,10 @@ void Player::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
             }
         }
     }
+    for (int i = 0; i < 5; i++){
+        appleCounter_[i]->Rotate(Quaternion(0.0f, (i+5) * 23.0f * timeStep, 0.0f));
+        heartCounter_[i]->Rotate(Quaternion(0.0f, (i+5) * 23.0f * timeStep, 0.0f));
+    }
 }
 
 void Player::FireBullet(const Vector3 fire, const float angle){
@@ -299,7 +303,7 @@ void Player::Die()
 void Player::SetHealth(float life)
 {
     health_ = Clamp(life, 0.0f, 15.0f);
-    healthBarNode_->SetScale(health_, 1.0f, 1.0f);
+    healthBarNode_->SetScale(health_, 0.5f, 0.5f);
 
     if (health_ <= 0.0f){
         Die();

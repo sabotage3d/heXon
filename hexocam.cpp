@@ -91,8 +91,8 @@ void heXoCam::SetupViewport()
     effectRenderPath_->SetShaderParameter("BloomThreshold", 0.23f);
     effectRenderPath_->SetShaderParameter("BloomMix", Vector2(1.75f, 2.25f));
     effectRenderPath_->SetEnabled("Bloom", true);
-    effectRenderPath_->Append(cache->GetResource<XMLFile>("PostProcess/GreyScale.xml"));
-    SetGreyScale(false);
+    //effectRenderPath_->Append(cache->GetResource<XMLFile>("PostProcess/GreyScale.xml"));
+    //SetGreyScale(false);
     viewport_->SetRenderPath(effectRenderPath_);
     renderer->SetViewport(0, viewport);
 }
