@@ -88,4 +88,5 @@ private:
     void FireBullet(const Vector3 direction);
     void UpgradeWeapons();
     void SetHealth(float health);
+    Color HealthToColor(float health);
 };

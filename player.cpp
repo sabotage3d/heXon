@@ -47,7 +47,7 @@ Player::Player(Context *context, MasterControl *masterControl):
     score_{0},
     weaponLevel_{0},
     bulletAmount_{0},
-    initialShotInterval_{0.35f},
+    initialShotInterval_{0.30f},
     shotInterval_{initialShotInterval_}
 {
     rootNode_->SetName("Player");
@@ -109,7 +109,7 @@ Player::Player(Context *context, MasterControl *masterControl):
     healthBarNode_->SetScale(health_, 0.5f, 0.5f);
     healthBarModel_ = healthBarNode_->CreateComponent<StaticModel>();
     healthBarModel_->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Bar.mdl"));
-    healthBarModel_->SetMaterial(masterControl_->cache_->GetResource<Material>("Resources/Materials/GreenGlowEnvmap.xml"));
+    healthBarModel_->SetMaterial(masterControl_->cache_->GetTempResource<Material>("Resources/Materials/GreenGlowEnvmap.xml"));
 
     shieldBarNode_ = masterControl_->world.scene->CreateChild("HealthBar");
     shieldBarNode_->SetPosition(0.0f, 1.0f, 21.0f);
@@ -178,10 +178,12 @@ void Player::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
     //Pulse and spin the counters' apples and hearts
     for (int i = 0; i < 5; i++){
         appleCounter_[i]->Rotate(Quaternion(0.0f, (i*i+10.0f) * 23.0f * timeStep, 0.0f));
-        appleCounter_[i]->SetScale(masterControl_->Sine(2.0f, 0.2f, 0.4, -i/M_TAU));
+        appleCounter_[i]->SetScale(masterControl_->Sine(1.0f+(appleCount_/2.0f), 0.2f, 0.4, -i/M_TAU));
         heartCounter_[i]->Rotate(Quaternion(0.0f, (i*i+10.0f) * 23.0f * timeStep, 0.0f));
-        heartCounter_[i]->SetScale(masterControl_->Sine(2.0f, 0.2f, 0.4, -i/M_TAU));
+        heartCounter_[i]->SetScale(masterControl_->Sine(1.0f+(heartCount_/2.0f), 0.2f, 0.4, -i/M_TAU));
     }
+    //Update HealthBar color
+    healthBarModel_->GetMaterial()->SetShaderParameter("MatEmissiveColor", HealthToColor(health_));
 
     //Only handle input when player is active
     if (!rootNode_->IsEnabled()) return;
@@ -292,7 +294,7 @@ void Player::FireBullet(const Vector3 direction){
     Bullet* bullet = masterControl_->spawnMaster_->SpawnBullet(rootNode_->GetPosition() + direction);
     bullet->Set(rootNode_->GetPosition() + direction);
     bullet->rootNode_->LookAt(bullet->rootNode_->GetPosition() + direction*5.0f);
-    bullet->rigidBody_->ApplyForce(direction*1500.0f);
+    bullet->rigidBody_->ApplyForce(direction*(1500.0f+50.0f*weaponLevel_));
     bullet->damage_ = 0.15f + 0.00666f * weaponLevel_;
 }
 
@@ -346,6 +348,17 @@ void Player::SetHealth(float health)
     }
 }
 
+Color Player::HealthToColor(float health)
+{
+    Color color(1.0f, 1.0f, 0.05f, 1.0f);
+    health = Clamp(health, 0.0f, 10.0f);
+    float maxBright = 0.666f;
+    if (health < 3.0f) maxBright = masterControl_->Sine(2.0f+3.0f-health, 0.05f, 1.0f);
+    color.r_ = Clamp((3.0f - (health - 3.0f))/3.0f, 0.0f, maxBright);
+    color.g_ = Clamp((health - 3.0f)/4.0f, 0.0f, maxBright);
+    return color;
+}
+
 void Player::Hit(float damage)
 {
     SetHealth(health_ - damage);
@@ -356,6 +369,6 @@ void Player::UpgradeWeapons()
     if (weaponLevel_ < 23){
         ++weaponLevel_;
         bulletAmount_ = 1 + ((weaponLevel_+5) / 6);
-        shotInterval_ = 0.36f - 0.01f*weaponLevel_;
+        shotInterval_ = initialShotInterval_ - 0.01f*weaponLevel_;
     }
 }
