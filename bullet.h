@@ -40,11 +40,11 @@ protected:
     void Set(Vector3 position);
     void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
 private:
-    double age_ = 0.0;
-    double timeSinceHit_ = 0.0;
-    double lifeTime_;
+    float age_ = 0.0f;
+    float timeSinceHit_ = 0.0f;
+    float lifeTime_;
     bool fading_ = false;
-    double damage_;
+    float damage_;
     void HitCheck(float timeStep);
     void Disable();
 };

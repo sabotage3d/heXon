@@ -125,23 +125,6 @@ bool SpawnMaster::RespawnSpire(Vector3 position)
     return false;
 }
 
-Bullet* SpawnMaster::SpawnBullet(Vector3 position)
-{
-    Bullet* bullet = RespawnBullet();
-    if (bullet == nullptr){
-        bullet = new Bullet(context_, masterControl_);
-        bullets_.Push(SharedPtr<Bullet>(bullet));
-    }
-    bullet->Set(position);
-    return bullet;
-}
-Bullet* SpawnMaster::RespawnBullet()
-{
-    for (int b = 0; b < bullets_.Length(); b++){
-        if (!bullets_[b]->rootNode_->IsEnabled()){
-            return bullets_[b];
-        }
-    }
-}
+
 
 

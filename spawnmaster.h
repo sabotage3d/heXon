@@ -24,7 +24,6 @@
 #include "mastercontrol.h"
 #include "razor.h"
 #include "spire.h"
-#include "bullet.h"
 
 class SpawnMaster : public Object
 {
@@ -34,12 +33,10 @@ public:
 
     HashMap<unsigned, SharedPtr<Razor> > razors_;
     HashMap<unsigned, SharedPtr<Spire> > spires_;
-    Vector<SharedPtr<Bullet> > bullets_;
 
     Vector3 CreateSpawnPoint();
 
-    Bullet *SpawnBullet(Vector3 position);
-    Bullet *RespawnBullet();
+
     int CountActiveRazors();
     int CountActiveSpires();
 private:

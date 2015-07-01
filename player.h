@@ -29,6 +29,7 @@
 #include <Urho3D/Audio/SoundSource.h>
 
 #include "sceneobject.h"
+#include "bullet.h"
 
 namespace Urho3D {
 class Drawable;
@@ -78,6 +79,7 @@ private:
     Node* heartCounterRoot_;
     Node* heartCounter_[5];
 
+    Vector<SharedPtr<Bullet> > bullets_;
     SharedPtr<Sound> shot_;
     Vector<SharedPtr<SoundSource> > sampleSources_;
 
@@ -85,7 +87,7 @@ private:
 
     void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
     void PlaySample(Sound *sample);
-    void FireBullet(const Vector3 direction);
+    void FireBullet(Vector3 direction);
     void UpgradeWeapons();
     void SetHealth(float health);
     Color HealthToColor(float health);

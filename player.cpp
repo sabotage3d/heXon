@@ -174,7 +174,7 @@ void Player::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
     using namespace Update;
 
     //Take the frame time step, which is stored as a double
-    double timeStep = eventData[P_TIMESTEP].GetFloat();
+    float timeStep = eventData[P_TIMESTEP].GetFloat();
     //Pulse and spin the counters' apples and hearts
     for (int i = 0; i < 5; i++){
         appleCounter_[i]->Rotate(Quaternion(0.0f, (i*i+10.0f) * 23.0f * timeStep, 0.0f));
@@ -195,8 +195,8 @@ void Player::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
     Vector3 move = Vector3::ZERO;
     Vector3 moveJoy = Vector3::ZERO;
     Vector3 moveKey = Vector3::ZERO;
-    double thrust = 2323.0;
-    double maxSpeed = 23.0;
+    float thrust = 2323.0f;
+    float maxSpeed = 23.0f;
     //Firing values
     Vector3 fire = Vector3::ZERO;
     Vector3 fireJoy = Vector3::ZERO;
@@ -290,8 +290,19 @@ void Player::Shoot(Vector3 fire)
     }
 }
 
-void Player::FireBullet(const Vector3 direction){
-    Bullet* bullet = masterControl_->spawnMaster_->SpawnBullet(rootNode_->GetPosition() + direction);
+void Player::FireBullet(Vector3 direction){
+    SharedPtr<Bullet> bullet;
+    if (bullets_.Length() > 0){
+        for (int b = 0; b < bullets_.Length(); b++){
+            if (!bullets_[b]->rootNode_->IsEnabled()){
+                bullet = bullets_[b];
+            }
+        }
+    }
+    if (bullet == nullptr){
+        bullet = new Bullet(context_, masterControl_);
+        bullets_.Push(bullet);
+    }
     bullet->Set(rootNode_->GetPosition() + direction);
     bullet->rootNode_->LookAt(bullet->rootNode_->GetPosition() + direction*5.0f);
     bullet->rigidBody_->ApplyForce(direction*(1500.0f+50.0f*weaponLevel_));

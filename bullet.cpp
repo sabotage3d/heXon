@@ -77,8 +77,8 @@ void Bullet::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
 
 void Bullet::Set(Vector3 position)
 {
-    age_ = 0.0;
-    timeSinceHit_ = 0.0;
+    age_ = 0.0f;
+    timeSinceHit_ = 0.0f;
     fading_ = false;
 
     rigidBody_->SetLinearVelocity(Vector3::ZERO);
