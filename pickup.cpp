@@ -93,9 +93,7 @@ void Pickup::HandleTriggerStart(StringHash eventType, VariantMap &eventData)
     for (int i = 0; i < collidingBodies.Length(); i++) {
         RigidBody* collider = collidingBodies[i];
         if (collider->GetNode()->GetNameHash() == N_PLAYER) {
-            rootNode_->SetPosition(masterControl_->spawnMaster_->CreateSpawnPoint());
-            rigidBody_->SetLinearVelocity(Vector3::ZERO);
-            rigidBody_->ResetForces();
+            Reset();
             sampleSource_->Play(sample_);
 
             masterControl_->player_->Pickup(rootNode_->GetNameHash());
@@ -113,5 +111,13 @@ void Pickup::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
         rootNode_->Translate(Vector3::UP * timeStep * (0.25f - rootNode_->GetPosition().y_));
     }
     triggerBody_->SetPosition(rootNode_->GetPosition());
+
+    if ((rootNode_->GetPosition()*(Vector3::ONE-Vector3::UP)).Length() > 23.0f) Reset();
 }
 
+void Pickup::Reset()
+{
+    rootNode_->SetPosition(masterControl_->spawnMaster_->CreateSpawnPoint());
+    rigidBody_->SetLinearVelocity(Vector3::ZERO);
+    rigidBody_->ResetForces();
+}

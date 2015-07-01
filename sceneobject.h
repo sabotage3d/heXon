@@ -34,6 +34,7 @@ class SceneObject : public Object
     friend class Seeker;
     OBJECT(SceneObject);
 public:
+    bool IsEnabled() {return rootNode_->IsEnabled();}
     SceneObject(Context *context, MasterControl* masterControl);
 protected:
     MasterControl* masterControl_;

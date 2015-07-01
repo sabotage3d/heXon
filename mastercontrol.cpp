@@ -101,7 +101,7 @@ void MasterControl::Start()
     //Hook up to the frame update and render post-update events
     SubscribeToEvents();
 
-    Sound* music = cache_->GetResource<Sound>("Resources/Music/Zentrix - Warp Drive.ogg"); //Battle
+    Sound* music = cache_->GetResource<Sound>("Resources/Music/Alien Chaos - Disorder.ogg"); //Battle
     music->SetLooped(true);
     Node* musicNode = world.scene->CreateChild("Music");
     SoundSource* musicSource = musicNode->CreateComponent<SoundSource>();
@@ -282,6 +282,10 @@ bool MasterControl::PhysicsSphereCast(PODVector<RigidBody*> &hitResults, Vector3
 void MasterControl::Exit()
 {
     engine_->Exit();
+}
+
+void MasterControl::Restart()
+{
 }
 
 void MasterControl::CreateSineLookupTable()

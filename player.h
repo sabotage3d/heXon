@@ -50,9 +50,10 @@ public:
     void AddScore(int points);
     void Pickup(const StringHash nameHash);
     void Die();
+    void Shoot(Vector3 fire);
 private:
-    double initialHealth_;
-    double health_;
+    float initialHealth_;
+    float health_;
     int score_;
     int weaponLevel_;
     int bulletAmount_;
@@ -60,14 +61,17 @@ private:
     int appleCount_ = 0;
     int heartCount_ = 0;
 
-    const double shotInterval_ = 0.23;
-    double sinceLastShot_ = 0.0;
+    float initialShotInterval_;
+    float shotInterval_;
+    float sinceLastShot_ = 0.0f;
 
     StaticModel* model_;
     RigidBody* rigidBody_;
 
     Node* healthBarNode_;
     StaticModel* healthBarModel_;
+    Node* shieldBarNode_;
+    StaticModel* shieldBarModel_;
 
     Node* appleCounterRoot_;
     Node* appleCounter_[5];
@@ -81,7 +85,7 @@ private:
 
     void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
     void PlaySample(Sound *sample);
-    void FireBullet(const Vector3 fire, const float angle);
+    void FireBullet(const Vector3 direction);
     void UpgradeWeapons();
-    void SetHealth(float life);
+    void SetHealth(float health);
 };

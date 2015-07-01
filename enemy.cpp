@@ -24,6 +24,7 @@
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Physics/RigidBody.h>
 #include <Urho3D/Physics/CollisionShape.h>
+#include <Urho3D/Physics/PhysicsEvents.h>
 #include <Urho3D/Graphics/ParticleEmitter.h>
 #include <Urho3D/Graphics/ParticleEffect.h>
 
@@ -35,7 +36,10 @@
 Enemy::Enemy(Context *context, MasterControl *masterControl, Vector3 position):
     SceneObject(context, masterControl),
     initialHealth_{1.0f},
-    mass_{2.0f}
+    mass_{2.0f},
+    whackInterval_{0.5f},
+    sinceLastWhack_{whackInterval_},
+    whackDamage_{0.5f}
 {
     health_ = initialHealth_;
     rootNode_->SetName("Enemy");
@@ -72,6 +76,7 @@ Enemy::Enemy(Context *context, MasterControl *masterControl, Vector3 position):
     masterControl_->tileMaster_->AddToAffectors(WeakPtr<Node>(rootNode_), WeakPtr<RigidBody>(rigidBody_));
 
     SubscribeToEvent(E_SCENEUPDATE, HANDLER(Enemy, HandleSceneUpdate));
+    SubscribeToEvent(rootNode_, E_NODECOLLISIONSTART, HANDLER(Enemy, HandleCollisionStart));
 }
 
 void Enemy::Set(Vector3 position)
@@ -129,4 +134,26 @@ void Enemy::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
     using namespace SceneUpdate;
     float timeStep = eventData[P_TIMESTEP].GetFloat();
     panicTime_ += 3.0f * panic_ * timeStep;
+    sinceLastWhack_ += timeStep;
+
+    if ((rootNode_->GetPosition()*(Vector3::ONE-Vector3::UP)).Length() > 23.5f) Disable();;
+}
+
+void Enemy::HandleCollisionStart(StringHash eventType, VariantMap &eventData)
+{
+    using namespace NodeCollisionStart;
+
+    PODVector<RigidBody*> collidingBodies;
+    rigidBody_->GetCollidingBodies(collidingBodies);
+
+    if (sinceLastWhack_ > whackInterval_){
+        for (int i = 0; i < collidingBodies.Length(); i++) {
+            RigidBody* collider = collidingBodies[i];
+            if (collider->GetNode()->GetNameHash() == N_PLAYER) {
+                //sampleSource_->Play(sample_);
+                masterControl_->player_->Hit(whackDamage_);
+                sinceLastWhack_ = 0.0f;
+            }
+        }
+    }
 }

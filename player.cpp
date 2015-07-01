@@ -46,7 +46,9 @@ Player::Player(Context *context, MasterControl *masterControl):
     health_{initialHealth_},
     score_{0},
     weaponLevel_{0},
-    bulletAmount_{0}
+    bulletAmount_{0},
+    initialShotInterval_{0.35f},
+    shotInterval_{initialShotInterval_}
 {
     rootNode_->SetName("Player");
 
@@ -109,6 +111,19 @@ Player::Player(Context *context, MasterControl *masterControl):
     healthBarModel_->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Bar.mdl"));
     healthBarModel_->SetMaterial(masterControl_->cache_->GetResource<Material>("Resources/Materials/GreenGlowEnvmap.xml"));
 
+    shieldBarNode_ = masterControl_->world.scene->CreateChild("HealthBar");
+    shieldBarNode_->SetPosition(0.0f, 1.0f, 21.0f);
+    shieldBarNode_->SetScale(health_, 0.45f, 0.45f);
+    shieldBarModel_ = shieldBarNode_->CreateComponent<StaticModel>();
+    shieldBarModel_->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Bar.mdl"));
+    shieldBarModel_->SetMaterial(masterControl_->cache_->GetResource<Material>("Resources/Materials/BlueGlowEnvmap.xml"));
+
+    Node* healthBarHolderNode = masterControl_->world.scene->CreateChild("HealthBarHolder");
+    healthBarHolderNode->SetPosition(0.0f, 1.0f, 21.0f);
+    StaticModel* healthBarHolderModel = healthBarHolderNode->CreateComponent<StaticModel>();
+    healthBarHolderModel->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/BarHolder.mdl"));
+    healthBarHolderModel->SetMaterial(masterControl_->cache_->GetResource<Material>("Resources/Materials/Metal.xml"));
+
     appleCounterRoot_ = masterControl_->world.scene->CreateChild("AppleCounter");
     for (int a = 0; a < 5; a++){
         appleCounter_[a] = appleCounterRoot_->CreateChild();
@@ -156,11 +171,21 @@ void Player::PlaySample(Sound* sample)
 
 void Player::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
 {
-    if (!rootNode_->IsEnabled()) return;
     using namespace Update;
 
     //Take the frame time step, which is stored as a double
     double timeStep = eventData[P_TIMESTEP].GetFloat();
+    //Pulse and spin the counters' apples and hearts
+    for (int i = 0; i < 5; i++){
+        appleCounter_[i]->Rotate(Quaternion(0.0f, (i*i+10.0f) * 23.0f * timeStep, 0.0f));
+        appleCounter_[i]->SetScale(masterControl_->Sine(2.0f, 0.2f, 0.4, -i/M_TAU));
+        heartCounter_[i]->Rotate(Quaternion(0.0f, (i*i+10.0f) * 23.0f * timeStep, 0.0f));
+        heartCounter_[i]->SetScale(masterControl_->Sine(2.0f, 0.2f, 0.4, -i/M_TAU));
+    }
+
+    //Only handle input when player is active
+    if (!rootNode_->IsEnabled()) return;
+
 
     Input* input = GetSubsystem<Input>();
 
@@ -223,52 +248,52 @@ void Player::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
     if (fire.Length()) {
         if (sinceLastShot_ > shotInterval_)
         {
-            for (int i = 0; i < bulletAmount_; i++) {
-                float angle = 0.0f;
-                switch (i) {
-                case 0: if (bulletAmount_ == 2 || bulletAmount_ == 3)
-                        angle = -5.0f;
-                    break;
-                case 1:
-                    if (bulletAmount_ < 4) angle = 5.0f;
-                    else angle = 7.5f;
-                    break;
-                case 2:
-                    if (bulletAmount_ < 5) angle = 180.0f;
-                    angle = 175.0f;
-                    break;
-                case 3:
-                    angle = -7.5f;
-                    break;
-                case 4:
-                    angle = 185.0f;
-                    break;
-                default: break;
-                }
-                FireBullet(fire, angle);
-            }
-            sinceLastShot_ = 0.0;
-            if (bulletAmount_ > 0){
-                new Muzzle(context_, masterControl_, rootNode_->GetPosition());
-                PlaySample(shot_);
-            }
+            Shoot(fire);
         }
-    }
-    for (int i = 0; i < 5; i++){
-        appleCounter_[i]->Rotate(Quaternion(0.0f, (i*i+10.0f) * 23.0f * timeStep, 0.0f));
-        appleCounter_[i]->SetScale(masterControl_->Sine(2.0f, 0.2f, 0.4, -i/M_TAU));
-        heartCounter_[i]->Rotate(Quaternion(0.0f, (i*i+10.0f) * 23.0f * timeStep, 0.0f));
-        heartCounter_[i]->SetScale(masterControl_->Sine(2.0f, 0.2f, 0.4, -i/M_TAU));
     }
 }
 
-void Player::FireBullet(const Vector3 fire, const float angle){
-    Vector3 direction = Quaternion(angle, Vector3::UP) * fire;
+void Player::Shoot(Vector3 fire)
+{
+    for (int i = 0; i < bulletAmount_; i++) {
+        float angle = 0.0f;
+        switch (i) {
+        case 0: if (bulletAmount_ == 2 || bulletAmount_ == 3)
+                angle = -5.0f;
+            break;
+        case 1:
+            if (bulletAmount_ < 4) angle = 5.0f;
+            else angle = 7.5f;
+            break;
+        case 2:
+            if (bulletAmount_ < 5) angle = 180.0f;
+            angle = 175.0f;
+            break;
+        case 3:
+            angle = -7.5f;
+            break;
+        case 4:
+            angle = 185.0f;
+            break;
+        default: break;
+        }
+        Vector3 direction = Quaternion(angle, Vector3::UP) * fire;
+        FireBullet(direction);
+    }
+    sinceLastShot_ = 0.0;
+    //Create a single muzzle flash
+    if (bulletAmount_ > 0){
+        new Muzzle(context_, masterControl_, rootNode_->GetPosition());
+        PlaySample(shot_);
+    }
+}
+
+void Player::FireBullet(const Vector3 direction){
     Bullet* bullet = masterControl_->spawnMaster_->SpawnBullet(rootNode_->GetPosition() + direction);
     bullet->Set(rootNode_->GetPosition() + direction);
     bullet->rootNode_->LookAt(bullet->rootNode_->GetPosition() + direction*5.0f);
     bullet->rigidBody_->ApplyForce(direction*1500.0f);
-    bullet->damage_ = 0.15f + 0.005f * weaponLevel_;
+    bullet->damage_ = 0.15f + 0.00666f * weaponLevel_;
 }
 
 void Player::Pickup(const StringHash nameHash)
@@ -310,10 +335,11 @@ void Player::Die()
     //masterControl_->world.camera->SetGreyScale(true);
 }
 
-void Player::SetHealth(float life)
+void Player::SetHealth(float health)
 {
-    health_ = Clamp(life, 0.0f, 15.0f);
-    healthBarNode_->SetScale(Vector3(health_, 0.5f, 0.5f));
+    health_ = Clamp(health, 0.0f, 15.0f);
+    healthBarNode_->SetScale(Vector3(Min(health_, 10.0f), 0.5f, 0.5f));
+    shieldBarNode_->SetScale(Vector3(health_, 0.45f, 0.45f));
 
     if (health_ <= 0.0f){
         Die();
@@ -327,6 +353,9 @@ void Player::Hit(float damage)
 
 void Player::UpgradeWeapons()
 {
-    ++weaponLevel_;
-    bulletAmount_ = 1 + ((weaponLevel_+5) / 6);
+    if (weaponLevel_ < 23){
+        ++weaponLevel_;
+        bulletAmount_ = 1 + ((weaponLevel_+5) / 6);
+        shotInterval_ = 0.36f - 0.01f*weaponLevel_;
+    }
 }

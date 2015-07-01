@@ -41,7 +41,6 @@ public:
     Enemy(Context* context, MasterControl* masterControl, Vector3 position);
     double GetHealth(){return health_;}
     void Hit(float damage, int ownerID);
-    void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
 protected:
     float panicTime_ = 0.0f;
     float health_;
@@ -53,6 +52,10 @@ protected:
     int firstHitBy_ = 0;
     int lastHitBy_ = 0;
 
+    float sinceLastWhack_;
+    float whackInterval_;
+    float whackDamage_;
+
     SharedPtr<Node> particleNode_;
     RigidBody* rigidBody_;
     StaticModel* centerModel_;
@@ -60,6 +63,9 @@ protected:
     void CheckHealth();
     void Set(Vector3 position);
     Color GetGlowColor();
+
 private:
     void Disable();
+    void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
+    void HandleCollisionStart(StringHash eventType, VariantMap &eventData);
 };

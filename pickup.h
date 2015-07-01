@@ -36,6 +36,7 @@ class Pickup : public SceneObject
     OBJECT(Pickup);
 public:
     Pickup(Context *context, MasterControl* masterControl);
+    void Reset();
 protected:
     SharedPtr<RigidBody> rigidBody_;
     SharedPtr<RigidBody> triggerBody_;

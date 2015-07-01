@@ -21,6 +21,7 @@
 #include "spawnmaster.h"
 #include "tilemaster.h"
 #include "tile.h"
+#include "player.h"
 
 SpawnMaster::SpawnMaster(Context *context, MasterControl *masterControl):
     Object(context),
@@ -53,12 +54,14 @@ void SpawnMaster::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
     sinceRazorSpawn_ += timeStep;
     sinceSpireSpawn_ += timeStep;
 
-    if (sinceRazorSpawn_ > razorInterval_/* &&
-            CountActiveRazors() < 23*/)
-        SpawnRazor(CreateSpawnPoint());
-    if (sinceSpireSpawn_ > spireInterval_/* &&
-            CountActiveSpires() < 7*/)
-        SpawnSpire(CreateSpawnPoint());
+    if (masterControl_->player_->IsEnabled()){
+        if (sinceRazorSpawn_ > razorInterval_/* &&
+                    CountActiveRazors() < 23*/)
+            SpawnRazor(CreateSpawnPoint());
+        if (sinceSpireSpawn_ > spireInterval_/* &&
+                    CountActiveSpires() < 7*/)
+            SpawnSpire(CreateSpawnPoint());
+    }
 }
 
 int SpawnMaster::CountActiveRazors()

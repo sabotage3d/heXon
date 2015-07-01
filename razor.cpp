@@ -33,6 +33,7 @@ Razor::Razor(Context *context, MasterControl *masterControl, Vector3 position):
     aimSpeed_{0.25*topSpeed_}
 {
     rootNode_->SetName("Razor");
+    whackDamage_ = 1.0f;
 
     SharedPtr<Material> black = masterControl_->cache_->GetTempResource<Material>("Resources/Materials/Razor.xml");
 

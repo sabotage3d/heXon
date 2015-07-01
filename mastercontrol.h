@@ -129,6 +129,7 @@ public:
     bool editMode_;
     bool PhysicsRayCast(PODVector<PhysicsRaycastResult> &hitResults, Urho3D::Ray ray, float distance, unsigned collisionMask);
     bool PhysicsSphereCast(PODVector<RigidBody *> &hitResults, Vector3 center, float radius, unsigned collisionMask);
+    void Restart();
 private:
     /// Set custom window title and icon
     void SetWindowTitleAndIcon();
