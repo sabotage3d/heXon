@@ -35,7 +35,7 @@
 
 Seeker::Seeker(Context *context, MasterControl *masterControl, Vector3 position):
     SceneObject(context, masterControl),
-    lifeTime_{10.0f},
+    lifeTime_{8.8f},
     damage_{2.3f}
 {
     rootNode_->SetName("Seeker");

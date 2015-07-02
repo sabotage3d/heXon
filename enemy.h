@@ -24,6 +24,7 @@
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Audio/Sound.h>
 #include <Urho3D/Audio/SoundSource.h>
+#include <Urho3D/Graphics/ParticleEffect.h>
 
 #include "sceneobject.h"
 
@@ -60,6 +61,7 @@ protected:
     float meleeDamage_;
 
     SharedPtr<Node> particleNode_;
+    SharedPtr<ParticleEffect> particleEffect_;
     RigidBody* rigidBody_;
     StaticModel* centerModel_;
     Color color_;

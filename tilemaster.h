@@ -19,8 +19,9 @@
 #ifndef TILEMASTER_H
 #define TILEMASTER_H
 
-#include "mastercontrol.h"
 #include <Urho3D/Core/CoreEvents.h>
+
+#include "mastercontrol.h"
 
 namespace Urho3D {
 class Drawable;

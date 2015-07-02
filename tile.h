@@ -19,10 +19,11 @@
 #ifndef TILE_H
 #define TILE_H
 
-#include "tilemaster.h"
 #include <Urho3D/Urho3D.h>
 #include <Urho3D/Graphics/StaticModel.h>
 #include <Urho3D/Core/CoreEvents.h>
+
+#include "tilemaster.h"
 
 namespace Urho3D {
 class Drawable;

@@ -85,6 +85,7 @@ void Razor::Hit(float damage, int ownerID)
 {
     Enemy::Hit(damage, ownerID);
     aimSpeed_ = (0.25 + 0.75 * panic_) * topSpeed_;
+
 }
 
 void Razor::Set(Vector3 position)
