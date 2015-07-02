@@ -42,8 +42,8 @@
 
 Player::Player(Context *context, MasterControl *masterControl):
     SceneObject(context, masterControl),
-    initialHealth_{10.0},
-    health_{initialHealth_},
+    initialHealth_{10.0f},
+    health_{5.0f},
     score_{0},
     weaponLevel_{0},
     bulletAmount_{0},
@@ -106,14 +106,14 @@ Player::Player(Context *context, MasterControl *masterControl):
     //Setup 3D GUI elements
     healthBarNode_ = masterControl_->world.scene->CreateChild("HealthBar");
     healthBarNode_->SetPosition(0.0f, 1.0f, 21.0f);
-    healthBarNode_->SetScale(health_, 0.5f, 0.5f);
+    healthBarNode_->SetScale(health_, 1.0f, 1.0f);
     healthBarModel_ = healthBarNode_->CreateComponent<StaticModel>();
     healthBarModel_->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Bar.mdl"));
     healthBarModel_->SetMaterial(masterControl_->cache_->GetTempResource<Material>("Resources/Materials/GreenGlowEnvmap.xml"));
 
     shieldBarNode_ = masterControl_->world.scene->CreateChild("HealthBar");
     shieldBarNode_->SetPosition(0.0f, 1.0f, 21.0f);
-    shieldBarNode_->SetScale(health_, 0.45f, 0.45f);
+    shieldBarNode_->SetScale(health_, 0.9f, 0.9f);
     shieldBarModel_ = shieldBarNode_->CreateComponent<StaticModel>();
     shieldBarModel_->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Bar.mdl"));
     shieldBarModel_->SetMaterial(masterControl_->cache_->GetResource<Material>("Resources/Materials/BlueGlowEnvmap.xml"));
@@ -178,9 +178,9 @@ void Player::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
     //Pulse and spin the counters' apples and hearts
     for (int i = 0; i < 5; i++){
         appleCounter_[i]->Rotate(Quaternion(0.0f, (i*i+10.0f) * 23.0f * timeStep, 0.0f));
-        appleCounter_[i]->SetScale(masterControl_->Sine(1.0f+(appleCount_/2.0f), 0.2f, 0.4, -i/M_TAU));
+        appleCounter_[i]->SetScale(masterControl_->Sine(1.0f+(appleCount_/2.0f), 0.2f, 0.4, -i/(2.0f*M_PI)));
         heartCounter_[i]->Rotate(Quaternion(0.0f, (i*i+10.0f) * 23.0f * timeStep, 0.0f));
-        heartCounter_[i]->SetScale(masterControl_->Sine(1.0f+(heartCount_/2.0f), 0.2f, 0.4, -i/M_TAU));
+        heartCounter_[i]->SetScale(masterControl_->Sine(1.0f+(heartCount_/2.0f), 0.2f, 0.4, -i/(2.0f*M_PI)));
     }
     //Update HealthBar color
     healthBarModel_->GetMaterial()->SetShaderParameter("MatEmissiveColor", HealthToColor(health_));
@@ -351,8 +351,8 @@ void Player::Die()
 void Player::SetHealth(float health)
 {
     health_ = Clamp(health, 0.0f, 15.0f);
-    healthBarNode_->SetScale(Vector3(Min(health_, 10.0f), 0.5f, 0.5f));
-    shieldBarNode_->SetScale(Vector3(health_, 0.45f, 0.45f));
+    healthBarNode_->SetScale(Vector3(Min(health_, 10.0f), 1.0f, 1.0f));
+    shieldBarNode_->SetScale(Vector3(health_, 0.95f, 0.95f));
 
     if (health_ <= 0.0f){
         Die();

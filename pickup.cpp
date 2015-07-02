@@ -112,7 +112,7 @@ void Pickup::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
     }
     triggerBody_->SetPosition(rootNode_->GetPosition());
 
-    if ((rootNode_->GetPosition()*(Vector3::ONE-Vector3::UP)).Length() > 23.0f) Reset();
+    if ((rootNode_->GetPosition()*(Vector3::ONE-Vector3::UP)).Length() > 23.666f) Reset();
 }
 
 void Pickup::Reset()

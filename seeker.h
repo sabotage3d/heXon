@@ -44,7 +44,7 @@ protected:
     RigidBody* rigidBody_;
     SharedPtr<Node> target_;
 
-    double age_ = 0.0;
-    double lifeTime_;
-    double damage_;
+    float age_ = 0.0f;
+    float lifeTime_;
+    float damage_;
 };

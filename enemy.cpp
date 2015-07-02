@@ -39,7 +39,7 @@ Enemy::Enemy(Context *context, MasterControl *masterControl, Vector3 position):
     mass_{2.0f},
     whackInterval_{0.5f},
     sinceLastWhack_{whackInterval_},
-    whackDamage_{0.5f}
+    meleeDamage_{0.5f}
 {
     health_ = initialHealth_;
     rootNode_->SetName("Enemy");
@@ -72,6 +72,19 @@ Enemy::Enemy(Context *context, MasterControl *masterControl, Vector3 position):
     rigidBody_->SetAngularFactor(Vector3::ZERO);
     CollisionShape* collider = rootNode_->CreateComponent<CollisionShape>();
     collider->SetSphere(2.0f);
+
+    samples_.Push(SharedPtr<Sound>(masterControl_->cache_->GetResource<Sound>("Resources/Samples/Melee1.ogg")));
+    samples_.Push(SharedPtr<Sound>(masterControl_->cache_->GetResource<Sound>("Resources/Samples/Melee2.ogg")));
+    samples_.Push(SharedPtr<Sound>(masterControl_->cache_->GetResource<Sound>("Resources/Samples/Melee3.ogg")));
+    samples_.Push(SharedPtr<Sound>(masterControl_->cache_->GetResource<Sound>("Resources/Samples/Melee4.ogg")));
+    samples_.Push(SharedPtr<Sound>(masterControl_->cache_->GetResource<Sound>("Resources/Samples/Melee5.ogg")));
+    for (int s = 0; s < samples_.Length(); s++){
+        samples_[s]->SetLooped(false);
+    }
+
+    soundSource_ = rootNode_->CreateComponent<SoundSource>();
+    soundSource_->SetGain(0.1f);
+    soundSource_->SetSoundType(SOUND_EFFECT);
 
     masterControl_->tileMaster_->AddToAffectors(WeakPtr<Node>(rootNode_), WeakPtr<RigidBody>(rigidBody_));
 
@@ -136,7 +149,7 @@ void Enemy::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
     panicTime_ += 3.0f * panic_ * timeStep;
     sinceLastWhack_ += timeStep;
 
-    if ((rootNode_->GetPosition()*(Vector3::ONE-Vector3::UP)).Length() > 23.5f) Disable();;
+    if ((rootNode_->GetPosition()*(Vector3::ONE-Vector3::UP)).Length() > 23.666f) Disable();;
 }
 
 void Enemy::HandleCollisionStart(StringHash eventType, VariantMap &eventData)
@@ -150,8 +163,8 @@ void Enemy::HandleCollisionStart(StringHash eventType, VariantMap &eventData)
         for (int i = 0; i < collidingBodies.Length(); i++) {
             RigidBody* collider = collidingBodies[i];
             if (collider->GetNode()->GetNameHash() == N_PLAYER) {
-                //sampleSource_->Play(sample_);
-                masterControl_->player_->Hit(whackDamage_);
+                soundSource_->Play(samples_[Random((int)samples_.Length())]);
+                masterControl_->player_->Hit(meleeDamage_);
                 sinceLastWhack_ = 0.0f;
             }
         }

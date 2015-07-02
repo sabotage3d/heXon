@@ -21,6 +21,8 @@
 #include <Urho3D/Urho3D.h>
 #include <Urho3D/Graphics/StaticModel.h>
 #include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Audio/Sound.h>
+#include <Urho3D/Audio/SoundSource.h>
 
 #include "sceneobject.h"
 
@@ -54,7 +56,7 @@ protected:
 
     float sinceLastWhack_;
     float whackInterval_;
-    float whackDamage_;
+    float meleeDamage_;
 
     SharedPtr<Node> particleNode_;
     RigidBody* rigidBody_;
@@ -63,8 +65,9 @@ protected:
     void CheckHealth();
     void Set(Vector3 position);
     Color GetGlowColor();
-
 private:
+    Vector<SharedPtr<Sound> > samples_;
+    SharedPtr<SoundSource> soundSource_;
     void Disable();
     void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
     void HandleCollisionStart(StringHash eventType, VariantMap &eventData);
