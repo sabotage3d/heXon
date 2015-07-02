@@ -16,7 +16,8 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#pragma once
+#ifndef HEXOCAM_H
+#define HEXOCAM_H
 
 #include "mastercontrol.h"
 
@@ -64,3 +65,5 @@ private:
     double forceMultiplier = 1.0;
     void SetupViewport();
 };
+
+#endif

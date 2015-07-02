@@ -16,7 +16,8 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#pragma once
+#ifndef BULLET_H
+#define BULLET_H
 
 #include "sceneobject.h"
 
@@ -48,3 +49,5 @@ private:
     void HitCheck(float timeStep);
     void Disable();
 };
+
+#endif

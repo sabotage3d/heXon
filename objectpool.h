@@ -16,7 +16,8 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#pragma once
+#ifndef OBJECTPOOL_H
+#define OBJECTPOOL_H
 
 #include "mastercontrol.h"
 #include "sceneobject.h"
@@ -36,3 +37,5 @@ public:
     ObjectPool(Context *context, MasterControl *masterControl);
 private:
 };
+
+#endif

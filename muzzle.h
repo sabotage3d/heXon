@@ -16,7 +16,8 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#pragma once
+#ifndef MUZZLE_H
+#define MUZZLE_H
 
 #include <Urho3D/Urho3D.h>
 #include <Urho3D/Core/CoreEvents.h>
@@ -41,3 +42,5 @@ public:
     Muzzle(Context* context, MasterControl* masterControl, Vector3 position);
     void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
 };
+
+#endif

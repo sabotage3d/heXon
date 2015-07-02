@@ -16,7 +16,8 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#pragma once
+#ifndef ARENAEDGE_H
+#define ARENAEDGE_H
 
 #include <Urho3D/Graphics/StaticModel.h>
 #include <Urho3D/Audio/Sound.h>
@@ -39,3 +40,5 @@ protected:
 private:
 
 };
+
+#endif

@@ -16,8 +16,8 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#pragma once
-
+#ifndef RAZOR_H
+#define RAZOR_H
 
 #include <Urho3D/Urho3D.h>
 #include <Urho3D/Graphics/StaticModel.h>
@@ -54,3 +54,5 @@ protected:
 
     void HandleRazorUpdate(StringHash eventType, VariantMap &eventData);
 };
+
+#endif

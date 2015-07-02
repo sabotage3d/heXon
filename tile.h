@@ -16,7 +16,8 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#pragma once
+#ifndef TILE_H
+#define TILE_H
 
 #include "tilemaster.h"
 #include <Urho3D/Urho3D.h>
@@ -63,3 +64,5 @@ private:
     void FixFringe();
     void SetTileType(TileType type);
 };
+
+#endif

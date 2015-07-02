@@ -16,7 +16,8 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#pragma once
+#ifndef SEEKER_H
+#define SEEKER_H
 
 #include <Urho3D/Urho3D.h>
 #include <Urho3D/Graphics/StaticModel.h>
@@ -48,3 +49,5 @@ protected:
     float lifeTime_;
     float damage_;
 };
+
+#endif

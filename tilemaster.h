@@ -16,7 +16,8 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#pragma once
+#ifndef TILEMASTER_H
+#define TILEMASTER_H
 
 #include "mastercontrol.h"
 #include <Urho3D/Core/CoreEvents.h>
@@ -98,3 +99,5 @@ private:
     void UpdateCenterOfMass();
     void Move(double timeStep);
 };
+
+#endif

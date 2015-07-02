@@ -16,7 +16,8 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#pragma once
+#ifndef EFFECT_H
+#define EFFECT_H
 
 #include <Urho3D/Urho3D.h>
 #include <Urho3D/Core/CoreEvents.h>
@@ -45,3 +46,5 @@ protected:
     double age_ = 0.0;
     double emitTime_ = 0.1;
 };
+
+#endif

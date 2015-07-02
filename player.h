@@ -16,7 +16,8 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#pragma once
+#ifndef PLAYER_H
+#define PLAYER_H
 
 #include <Urho3D/Urho3D.h>
 #include <Urho3D/Graphics/StaticModel.h>
@@ -92,3 +93,5 @@ private:
     void SetHealth(float health);
     Color HealthToColor(float health);
 };
+
+#endif

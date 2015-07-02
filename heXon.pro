@@ -41,7 +41,6 @@ SOURCES += \
     spawnmaster.cpp \
     spire.cpp \
     objectpool.cpp \
-    pickupcounter.cpp \
     muzzle.cpp \
     seeker.cpp
 
@@ -67,6 +66,5 @@ HEADERS += \
     spawnmaster.h \
     spire.h \
     objectpool.h \
-    pickupcounter.h \
     muzzle.h \
     seeker.h

@@ -16,7 +16,8 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#pragma once
+#ifndef EXPLOSION_H
+#define EXPLOSION_H
 
 #include <Urho3D/Urho3D.h>
 #include <Urho3D/Core/CoreEvents.h>
@@ -51,3 +52,5 @@ private:
     float initialMass_;
     float initialBrightness_;
 };
+
+#endif

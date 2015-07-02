@@ -16,7 +16,8 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#pragma once
+#ifndef INPUTMASTER_H
+#define INPUTMASTER_H
 
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/Input/InputEvents.h>
@@ -144,3 +145,5 @@ private:
     Vector<SharedPtr<Tile> > selectedTiles_;
     void AddSelection(SharedPtr<Tile> tile);
 };
+
+#endif

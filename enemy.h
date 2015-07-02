@@ -16,7 +16,8 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#pragma once
+#ifndef ENEMY_H
+#define ENEMY_H
 
 #include <Urho3D/Urho3D.h>
 #include <Urho3D/Graphics/StaticModel.h>
@@ -72,3 +73,5 @@ private:
     void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
     void HandleCollisionStart(StringHash eventType, VariantMap &eventData);
 };
+
+#endif

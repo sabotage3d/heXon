@@ -16,7 +16,8 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#pragma once
+#ifndef SPAWNMASTER_H
+#define SPAWNMASTER_H
 
 #include <Urho3D/Urho3D.h>
 #include <Urho3D/Scene/Scene.h>
@@ -54,3 +55,5 @@ private:
     void SpawnSpire(Vector3 position);
     bool RespawnSpire(Vector3 position);
 };
+
+#endif
