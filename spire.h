@@ -19,7 +19,7 @@
 #ifndef SPIRE_H
 #define SPIRE_H
 
-#include <Urho3D/Urho3D.h>
+//#include <Urho3D/Urho3D.h>
 #include <Urho3D/Graphics/StaticModel.h>
 #include <Urho3D/Core/CoreEvents.h>
 

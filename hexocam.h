@@ -19,6 +19,20 @@
 #ifndef HEXOCAM_H
 #define HEXOCAM_H
 
+#include <Urho3D/Urho3D.h>
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Scene/SceneEvents.h>
+#include <Urho3D/Graphics/Camera.h>
+#include <Urho3D/Graphics/Viewport.h>
+#include <Urho3D/Graphics/RenderPath.h>
+#include <Urho3D/Graphics/Light.h>
+#include <Urho3D/Physics/CollisionShape.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Resource/XMLFile.h>
+#include <Urho3D/Math/MathDefs.h>
+#include <Urho3D/Input/Input.h>
+
 #include "mastercontrol.h"
 
 namespace Urho3D {

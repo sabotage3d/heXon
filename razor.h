@@ -19,7 +19,7 @@
 #ifndef RAZOR_H
 #define RAZOR_H
 
-#include <Urho3D/Urho3D.h>
+//#include <Urho3D/Urho3D.h>
 #include <Urho3D/Graphics/StaticModel.h>
 #include <Urho3D/Core/CoreEvents.h>
 

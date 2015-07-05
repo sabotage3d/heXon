@@ -16,12 +16,12 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <Urho3D/Urho3D.h>
-#include <Urho3D/Scene/Scene.h>
-#include <Urho3D/Physics/RigidBody.h>
-#include <Urho3D/Graphics/Model.h>
-#include <Urho3D/Graphics/Material.h>
-#include <Urho3D/Resource/ResourceCache.h>
+//#include <Urho3D/Urho3D.h>
+//#include <Urho3D/Scene/Scene.h>
+//#include <Urho3D/Physics/RigidBody.h>
+//#include <Urho3D/Graphics/Model.h>
+//#include <Urho3D/Graphics/Material.h>
+//#include <Urho3D/Resource/ResourceCache.h>
 
 #include "mastercontrol.h"
 #include "tile.h"
@@ -69,7 +69,7 @@ void Tile::HandleUpdate(StringHash eventType, VariantMap &eventData)
 
     //Alien Chaos - Disorder = time*1.0525f
     //Talpa - Unusual Chair = time*1.444
-    wave_ = 6.0*pow(masterControl_->Sine(Abs(centerDistExp_ - elapsedTime * 0.666f)), 4.0);
+    wave_ = 6.0*pow(masterControl_->Sine(Abs(float(centerDistExp_ - elapsedTime) * 0.666f)), 4.0f);
 
     uint nHexAffectors = tileMaster_->hexAffectors_.Size();
     if (nHexAffectors) {
@@ -93,7 +93,7 @@ void Tile::HandleUpdate(StringHash eventType, VariantMap &eventData)
     Vector3 newPos = Vector3(lastPos.x_, referencePosition_.y_ - offsetY, lastPos.z_);
     rootNode_->SetPosition(newPos);
 
-    double color = Clamp((0.25 * offsetY) +0.3, 0.0, 1.0);
+    double color = Clamp((0.25f * offsetY) +0.3f, 0.0f, 1.0f);
     model_->GetMaterial(0)->SetShaderParameter("MatDiffColor", Color(color, color, color, color + (0.023 * wave_)));
 }
 

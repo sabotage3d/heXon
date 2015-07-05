@@ -16,19 +16,19 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <Urho3D/Urho3D.h>
-#include <Urho3D/Core/CoreEvents.h>
-#include <Urho3D/Scene/SceneEvents.h>
-#include <Urho3D/Graphics/Camera.h>
-#include <Urho3D/Graphics/Viewport.h>
-#include <Urho3D/Graphics/RenderPath.h>
-#include <Urho3D/Graphics/Light.h>
-#include <Urho3D/Physics/CollisionShape.h>
-#include <Urho3D/Scene/Scene.h>
-#include <Urho3D/Resource/ResourceCache.h>
-#include <Urho3D/Resource/XMLFile.h>
-#include <Urho3D/Math/MathDefs.h>
-#include <Urho3D/Input/Input.h>
+//#include <Urho3D/Urho3D.h>
+//#include <Urho3D/Core/CoreEvents.h>
+//#include <Urho3D/Scene/SceneEvents.h>
+//#include <Urho3D/Graphics/Camera.h>
+//#include <Urho3D/Graphics/Viewport.h>
+//#include <Urho3D/Graphics/RenderPath.h>
+//#include <Urho3D/Graphics/Light.h>
+//#include <Urho3D/Physics/CollisionShape.h>
+//#include <Urho3D/Scene/Scene.h>
+//#include <Urho3D/Resource/ResourceCache.h>
+//#include <Urho3D/Resource/XMLFile.h>
+//#include <Urho3D/Math/MathDefs.h>
+//#include <Urho3D/Input/Input.h>
 
 #include "hexocam.h"
 
@@ -85,8 +85,8 @@ void heXoCam::SetupViewport()
 
     //Add anti-asliasing
     effectRenderPath_ = viewport_->GetRenderPath()->Clone();
-    effectRenderPath_->Append(cache->GetResource<XMLFile>("PostProcess/FXAA3.xml"));
-    effectRenderPath_->SetEnabled("FXAA3", true);
+    effectRenderPath_->Append(cache->GetResource<XMLFile>("PostProcess/FXAA2.xml"));
+    effectRenderPath_->SetEnabled("FXAA2", true);
     effectRenderPath_->Append(cache->GetResource<XMLFile>("PostProcess/Bloom.xml"));
     effectRenderPath_->SetShaderParameter("BloomThreshold", 0.23f);
     effectRenderPath_->SetShaderParameter("BloomMix", Vector2(1.75f, 2.25f));

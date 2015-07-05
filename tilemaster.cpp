@@ -16,6 +16,7 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+/*
 #include <Urho3D/Urho3D.h>
 #include <Urho3D/Scene/Scene.h>
 #include <Urho3D/Container/Vector.h>
@@ -24,6 +25,9 @@
 #include <Urho3D/Graphics/Model.h>
 #include <Urho3D/Graphics/Material.h>
 #include <Urho3D/Resource/ResourceCache.h>
+ */
+
+#include <iostream>
 
 #include "tilemaster.h"
 #include "tile.h"
@@ -42,7 +46,9 @@ Object(context),
                     i + 1 < (bigHexSize - bigHexSize / 4) + ((bigHexSize - j + 1)) / 2 &&  //Exclude top right
                     i - 1 > (bigHexSize / 4) - ((bigHexSize - j + 2) / 2)) { //Exclude top left
                 Vector3 tilePos = Vector3((-bigHexSize / 2.0f + i) * 2.0f + j % 2, 0.0f, (-bigHexSize / 2.0f + j + 0.5f) * 1.8f);
-                tileMap_[IntVector2(i, j)] = new Tile(context_, this, tilePos);
+                //tileMap_[IntVector2(i, j)] = new Tile(context_, this, tilePos);
+                tileMap_[i] = new Tile(context_, this, tilePos);
+                
             }
         }
     }

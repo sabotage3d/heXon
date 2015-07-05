@@ -16,10 +16,19 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+
+
+//#include <Urho3D/Urho3D.h>
+//#include <Urho3D/Core/CoreEvents.h>
+//#include <Urho3D/Scene/Scene.h>
+//#include <Urho3D/Container/Vector.h>
+//#include <Urho3D/Math/Vector2.h>
+//#include <Urho3D/Graphics/StaticModel.h>
+//#include <Urho3D/Graphics/Model.h>
+//#include <Urho3D/Graphics/Material.h>
+//#include <Urho3D/Resource/ResourceCache.h>
 #ifndef TILEMASTER_H
 #define TILEMASTER_H
-
-#include <Urho3D/Core/CoreEvents.h>
 
 #include "mastercontrol.h"
 
@@ -38,6 +47,12 @@ class Slot;
 enum TileElement {TE_CENTER = 0, TE_NORTH, TE_EAST, TE_SOUTH, TE_WEST, TE_NORTHWEST, TE_NORTHEAST, TE_SOUTHEAST, TE_SOUTHWEST, TE_LENGTH};
 enum CornerType {CT_NONE, CT_IN, CT_OUT, CT_TWEEN, CT_DOUBLE, CT_FILL};
 enum TileType {B_SPACE, B_EMPTY, B_ENGINE};
+
+struct vec2
+{
+    int x;
+    int y;
+};
 
 class TileMaster : public Object
 {
@@ -80,7 +95,9 @@ public:
     Tile* GetRandomTile();
 private:
     HashMap<WeakPtr<Node>, WeakPtr<RigidBody> > hexAffectors_;
-    HashMap<IntVector2, SharedPtr<Tile> > tileMap_;
+    //HashMap<IntVector2, SharedPtr<Tile> > tileMap_;
+    //HashMap<IntVector2, SharedPtr<Tile> > tileMap_;
+    HashMap<int, SharedPtr<Tile>> tileMap_;
     HashMap<IntVector2, TileType> buildingMap_;
 
     bool selected_ = false;

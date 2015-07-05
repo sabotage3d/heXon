@@ -16,20 +16,20 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <Urho3D/Urho3D.h>
-#include <Urho3D/Scene/Scene.h>
-#include <Urho3D/Scene/SceneEvents.h>
-#include <Urho3D/Physics/CollisionShape.h>
-#include <Urho3D/Graphics/Model.h>
-#include <Urho3D/Graphics/Material.h>
-#include <Urho3D/Resource/ResourceCache.h>
-#include <Urho3D/UI/UI.h>
-#include <Urho3D/UI/Text.h>
-#include <Urho3D/UI/Font.h>
-#include <Urho3D/Graphics/ParticleEmitter.h>
-#include <Urho3D/Graphics/ParticleEffect.h>
-#include <Urho3D/Audio/Sound.h>
-#include <Urho3D/Audio/SoundSource.h>
+//#include <Urho3D/Urho3D.h>
+//#include <Urho3D/Scene/Scene.h>
+//#include <Urho3D/Scene/SceneEvents.h>
+//#include <Urho3D/Physics/CollisionShape.h>
+//#include <Urho3D/Graphics/Model.h>
+//#include <Urho3D/Graphics/Material.h>
+//#include <Urho3D/Resource/ResourceCache.h>
+//#include <Urho3D/UI/UI.h>
+//#include <Urho3D/UI/Text.h>
+//#include <Urho3D/UI/Font.h>
+//#include <Urho3D/Graphics/ParticleEmitter.h>
+//#include <Urho3D/Graphics/ParticleEffect.h>
+//#include <Urho3D/Audio/Sound.h>
+//#include <Urho3D/Audio/SoundSource.h>
 
 #include "mastercontrol.h"
 #include "spawnmaster.h"
@@ -105,21 +105,21 @@ Player::Player(Context *context, MasterControl *masterControl):
 
     //Setup 3D GUI elements
     healthBarNode_ = masterControl_->world.scene->CreateChild("HealthBar");
-    healthBarNode_->SetPosition(0.0f, 1.0f, 21.0f);
-    healthBarNode_->SetScale(health_, 1.0f, 1.0f);
+    healthBarNode_->SetPosition(Vector3(0.0f, 1.0f, 21.0f));
+    healthBarNode_->SetScale(Vector3(health_, 1.0f, 1.0f));
     healthBarModel_ = healthBarNode_->CreateComponent<StaticModel>();
     healthBarModel_->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Bar.mdl"));
     healthBarModel_->SetMaterial(masterControl_->cache_->GetTempResource<Material>("Resources/Materials/GreenGlowEnvmap.xml"));
 
     shieldBarNode_ = masterControl_->world.scene->CreateChild("HealthBar");
-    shieldBarNode_->SetPosition(0.0f, 1.0f, 21.0f);
-    shieldBarNode_->SetScale(health_, 0.9f, 0.9f);
+    shieldBarNode_->SetPosition(Vector3(0.0f, 1.0f, 21.0f));
+    shieldBarNode_->SetScale(Vector3(health_, 0.9f, 0.9f));
     shieldBarModel_ = shieldBarNode_->CreateComponent<StaticModel>();
     shieldBarModel_->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Bar.mdl"));
     shieldBarModel_->SetMaterial(masterControl_->cache_->GetResource<Material>("Resources/Materials/BlueGlowEnvmap.xml"));
 
     Node* healthBarHolderNode = masterControl_->world.scene->CreateChild("HealthBarHolder");
-    healthBarHolderNode->SetPosition(0.0f, 1.0f, 21.0f);
+    healthBarHolderNode->SetPosition(Vector3(0.0f, 1.0f, 21.0f));
     StaticModel* healthBarHolderModel = healthBarHolderNode->CreateComponent<StaticModel>();
     healthBarHolderModel->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/BarHolder.mdl"));
     healthBarHolderModel->SetMaterial(masterControl_->cache_->GetResource<Material>("Resources/Materials/Metal.xml"));
@@ -128,7 +128,7 @@ Player::Player(Context *context, MasterControl *masterControl):
     for (int a = 0; a < 5; a++){
         appleCounter_[a] = appleCounterRoot_->CreateChild();
         appleCounter_[a]->SetEnabled(false);
-        appleCounter_[a]->SetPosition(-((float)a + 8.0f), 1.0f, 21.0f);
+        appleCounter_[a]->SetPosition(Vector3(-((float)a + 8.0f), 1.0f, 21.0f));
         appleCounter_[a]->SetScale(0.333f);
         StaticModel* apple = appleCounter_[a]->CreateComponent<StaticModel>();
         apple->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Apple.mdl"));
@@ -139,7 +139,7 @@ Player::Player(Context *context, MasterControl *masterControl):
     for (int h = 0; h < 5; h++){
         heartCounter_[h] = heartCounterRoot_->CreateChild();
         heartCounter_[h]->SetEnabled(false);
-        heartCounter_[h]->SetPosition((float)h + 8.0f, 1.0f, 21.0f);
+        heartCounter_[h]->SetPosition(Vector3((float)h + 8.0f, 1.0f, 21.0f));
         heartCounter_[h]->SetScale(0.333f);
         StaticModel* heart = heartCounter_[h]->CreateComponent<StaticModel>();
         heart->SetModel(masterControl_->cache_->GetResource<Model>("Resources/Models/Heart.mdl"));
@@ -178,9 +178,9 @@ void Player::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
     //Pulse and spin the counters' apples and hearts
     for (int i = 0; i < 5; i++){
         appleCounter_[i]->Rotate(Quaternion(0.0f, (i*i+10.0f) * 23.0f * timeStep, 0.0f));
-        appleCounter_[i]->SetScale(masterControl_->Sine(1.0f+(appleCount_/2.0f), 0.2f, 0.4, -i/(2.0f*M_PI)));
+        appleCounter_[i]->SetScale(masterControl_->Sine(1.0f+(appleCount_/2.0f), 0.2f, 0.4f, float(-i/(2.0f*M_PI))));
         heartCounter_[i]->Rotate(Quaternion(0.0f, (i*i+10.0f) * 23.0f * timeStep, 0.0f));
-        heartCounter_[i]->SetScale(masterControl_->Sine(1.0f+(heartCount_/2.0f), 0.2f, 0.4, -i/(2.0f*M_PI)));
+        heartCounter_[i]->SetScale(masterControl_->Sine(1.0f+(heartCount_/2.0f), 0.2f, 0.4f, float(-i/(2.0f*M_PI))));
     }
     //Update HealthBar color
     healthBarModel_->GetMaterial()->SetShaderParameter("MatEmissiveColor", HealthToColor(health_));
@@ -328,7 +328,7 @@ void Player::Pickup(const StringHash nameHash)
             heartCount_ = 0;
             SetHealth(15.0);
         }
-        else SetHealth(Max(health_, Clamp(health_+5.0, 0.0, 10.0)));
+        else SetHealth(Max(health_, Clamp(health_+5.0f, 0.0f, 10.0f)));
     }
 
     for (int a = 0; a < 5; a++){

@@ -16,13 +16,13 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <Urho3D/Urho3D.h>
-#include <Urho3D/Scene/Scene.h>
-#include <Urho3D/Scene/SceneEvents.h>
-#include <Urho3D/Graphics/Material.h>
-#include <Urho3D/Resource/ResourceCache.h>
-#include <Urho3D/Graphics/ParticleEmitter.h>
-#include <Urho3D/Graphics/ParticleEffect.h>
+//#include <Urho3D/Urho3D.h>
+//#include <Urho3D/Scene/Scene.h>
+//#include <Urho3D/Scene/SceneEvents.h>
+//#include <Urho3D/Graphics/Material.h>
+//#include <Urho3D/Resource/ResourceCache.h>
+//#include <Urho3D/Graphics/ParticleEmitter.h>
+//#include <Urho3D/Graphics/ParticleEffect.h>
 
 #include "flash.h"
 
@@ -48,5 +48,5 @@ Flash::Flash(Context *context, MasterControl *masterControl, Vector3 position):
 
 void Flash::UpdateFlash(StringHash eventType, VariantMap &eventData)
 {
-    light_->SetBrightness(Max(initialBrightness_*(0.25 - age_)/0.25,0.0));
+    light_->SetBrightness(Max(initialBrightness_*(0.25f - age_)/0.25f,0.0f));
 }

@@ -16,25 +16,26 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <Urho3D/Urho3D.h>
-#include <Urho3D/Scene/Scene.h>
-#include <Urho3D/Scene/SceneEvents.h>
-#include <Urho3D/Graphics/Material.h>
-#include <Urho3D/Resource/ResourceCache.h>
-#include <Urho3D/Graphics/ParticleEmitter.h>
-#include <Urho3D/Graphics/ParticleEffect.h>
-#include <Urho3D/Audio/Sound.h>
-#include <Urho3D/Audio/SoundSource.h>
-#include <Urho3D/Math/Sphere.h>
+//#include <Urho3D/Urho3D.h>
+//#include <Urho3D/Scene/Scene.h>
+//#include <Urho3D/Scene/SceneEvents.h>
+//#include <Urho3D/Graphics/Material.h>
+//#include <Urho3D/Resource/ResourceCache.h>
+//#include <Urho3D/Graphics/ParticleEmitter.h>
+//#include <Urho3D/Graphics/ParticleEffect.h>
+//#include <Urho3D/Audio/Sound.h>
+//#include <Urho3D/Audio/SoundSource.h>
+//#include <Urho3D/Math/Sphere.h>
 
 #include "tilemaster.h"
 #include "spawnmaster.h"
 #include "explosion.h"
 #include "hitfx.h"
 
+
 Explosion::Explosion(Context *context, MasterControl *masterControl, Vector3 position, Color color, double size):
     Effect(context, masterControl, position),
-    initialMass_{3.0f*size},
+    initialMass_{static_cast<float>(3.0f*size)},
     initialBrightness_{8.0f}
 {
     rootNode_->SetName("Explosion");
@@ -79,8 +80,8 @@ void Explosion::UpdateExplosion(StringHash eventType, VariantMap& eventData)
     using namespace Update;
     float timeStep = eventData[P_TIMESTEP].GetFloat();
 
-    rigidBody_->SetMass(Max(initialMass_*((0.1 - age_)/0.1),0.01));
-    light_->SetBrightness(Max(initialBrightness_*(0.32 - age_)/0.32,0.0));
+    rigidBody_->SetMass(Max(initialMass_*((0.1f - age_)/0.1f),0.01f));
+    light_->SetBrightness(Max(initialBrightness_*(0.32f - age_)/0.32f,0.0f));
 
     if (rootNode_->IsEnabled() && masterControl_->world.scene->IsUpdateEnabled()) {
         PODVector<RigidBody* > hitResults;

@@ -19,12 +19,19 @@
 #ifndef INPUTMASTER_H
 #define INPUTMASTER_H
 
+#include <Urho3D/Urho3D.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/Input/InputEvents.h>
 #include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Scene/Node.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Graphics/OctreeQuery.h>
+#include <Urho3D/IO/FileSystem.h>
 
 #include "mastercontrol.h"
 #include "tile.h"
+
+
 
 namespace Urho3D {
 class Drawable;

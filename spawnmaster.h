@@ -19,8 +19,8 @@
 #ifndef SPAWNMASTER_H
 #define SPAWNMASTER_H
 
-#include <Urho3D/Urho3D.h>
-#include <Urho3D/Scene/Scene.h>
+//#include <Urho3D/Urho3D.h>
+//#include <Urho3D/Scene/Scene.h>
 
 #include "mastercontrol.h"
 #include "razor.h"

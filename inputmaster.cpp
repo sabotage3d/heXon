@@ -16,11 +16,11 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <Urho3D/Urho3D.h>
-#include <Urho3D/Scene/Node.h>
-#include <Urho3D/Graphics/Graphics.h>
-#include <Urho3D/Graphics/OctreeQuery.h>
-#include <Urho3D/IO/FileSystem.h>
+//#include <Urho3D/Urho3D.h>
+//#include <Urho3D/Scene/Node.h>
+//#include <Urho3D/Graphics/Graphics.h>
+//#include <Urho3D/Graphics/OctreeQuery.h>
+//#include <Urho3D/IO/FileSystem.h>
 
 #include "inputmaster.h"
 #include "tilemaster.h"

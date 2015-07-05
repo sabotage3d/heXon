@@ -19,7 +19,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <Urho3D/Urho3D.h>
+//#include <Urho3D/Urho3D.h>
 #include <Urho3D/Graphics/StaticModel.h>
 #include <Urho3D/UI/Text.h>
 #include <Urho3D/UI/Font.h>
